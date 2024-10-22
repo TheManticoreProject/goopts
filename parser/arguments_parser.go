@@ -139,6 +139,10 @@ func (ap *ArgumentsParser) populateMaps() {
 func (ap *ArgumentsParser) Parse() {
 	ap.populateMaps()
 
+	if len(ap.Banner) != 0 {
+		fmt.Printf("%s\n\n", ap.Banner)
+	}
+
 	// Store error messages of parsing arguments
 	errorMessages := []string{}
 
@@ -341,10 +345,6 @@ func (ap *ArgumentsParser) Get(argumentFlag string) (interface{}, error) {
 // The function ensures that the usage information is displayed in a clear and organized manner, making it easy for users to understand
 // the available command-line arguments and their descriptions.
 func (ap *ArgumentsParser) Usage() {
-	if len(ap.Banner) != 0 {
-		fmt.Printf("%s\n\n", ap.Banner)
-	}
-
 	// Create usage string
 	usage := filepath.Base(os.Args[0])
 
