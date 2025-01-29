@@ -37,14 +37,65 @@ import (
 //	Groups (map[string]*argumentgroup.ArgumentGroup): A map of named subgroups to organize related arguments
 //	                                                  into logical categories for better structure and readability.
 type ArgumentsParser struct {
-	Banner              string
+	Banner           string
+	ShowBannerOnHelp bool
+	ShowBannerOnRun  bool
+
 	PositionalArguments []positionals.PositionalArgument
-	DefaultGroup        *argumentgroup.ArgumentGroup
+
+	DefaultGroup *argumentgroup.ArgumentGroup
+
+	Groups map[string]*argumentgroup.ArgumentGroup
+
 	shortNameToArgument map[string]arguments.Argument
 	longNameToArgument  map[string]arguments.Argument
 	requiredArguments   []arguments.Argument
 	allArguments        []arguments.Argument
-	Groups              map[string]*argumentgroup.ArgumentGroup
+}
+
+func NewArgumentsParser(banner string) (ap *ArgumentsParser) {
+	ap = &ArgumentsParser{
+		Banner:           banner,
+		ShowBannerOnHelp: true,
+		ShowBannerOnRun:  true,
+	}
+
+	return ap
+}
+
+// ArgumentIsPresent checks if a given argument is present in the parsed arguments.
+// It supports both short (e.g., -e) and long (e.g., --example) argument names.
+//
+// Parameters:
+//   - argumentName: The name of the argument to check. It should start with a dash ('-')
+//     for short arguments or two dashes ('--') for long arguments.
+//
+// Returns:
+// - bool: true if the argument is present; false otherwise.
+//
+// The function first verifies that the argument name has a valid length and starts
+// with a dash. It then checks if the argument is in the `longNameToArgument` map
+// for long arguments or `shortNameToArgument` map for short arguments, returning
+// true if found and false if not.
+func (ap *ArgumentsParser) ArgumentIsPresent(argumentName string) bool {
+	if len(argumentName) < 2 || argumentName[0] != '-' {
+		return false
+	}
+
+	if argumentName[1] == '-' {
+		// Long argument flag (e.g., --example)
+		if argument, exists := ap.longNameToArgument[argumentName]; exists {
+			return argument.IsPresent()
+		}
+	} else {
+		// Short argument flag (e.g., -e)
+		if argument, exists := ap.shortNameToArgument[argumentName]; exists {
+			return argument.IsPresent()
+		}
+	}
+
+	// Argument not found
+	return false
 }
 
 // populateMaps initializes the maps that store the associations between short and long argument names

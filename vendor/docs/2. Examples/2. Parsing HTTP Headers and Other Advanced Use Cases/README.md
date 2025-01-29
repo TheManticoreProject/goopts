@@ -62,7 +62,7 @@ Accept-Encoding: gzip
 The program starts by setting up an ArgumentsParser with a banner message:
 
 ```go
-ap := parser.ArgumentsParser{Banner: "PoC of goopts parsing - HTTP request example v1.0 - by @podalirius_"}
+ap := parser.ArgumentsParser{Banner: "PoC of goopts parsing - HTTP request example v1.0 - by Remi GASCOU (Podalirius)"}
 ```
 
 ### Positional arguments

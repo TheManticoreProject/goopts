@@ -127,7 +127,7 @@ var (
 
 func parseArgs() {
 	// Create a new arguments parser with a custom banner
-	ap := parser.ArgumentsParser{Banner: "PoC of goopts parsing v.1.1 - by @podalirius_"}
+	ap := parser.ArgumentsParser{Banner: "PoC of goopts parsing v.1.1 - by Remi GASCOU (Podalirius)"}
 
 	ap.NewStringPositionalArgument(&a, "a", "Help message for A.")
 	ap.NewIntPositionalArgument(&b, "b", "Help message for B.")

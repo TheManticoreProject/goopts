@@ -23,7 +23,7 @@ var (
 
 func parseArgs() {
 	// Create a new arguments parser with a custom banner
-	ap := parser.ArgumentsParser{Banner: "PoC of goopts parsing - HTTP request example v1.0 - by @podalirius_"}
+	ap := parser.ArgumentsParser{Banner: "PoC of goopts parsing - HTTP request example v1.0 - by Remi GASCOU (Podalirius)"}
 
 	// Define positional argument
 	ap.NewStringPositionalArgument(&url, "url", "URL to send the HTTP request to.")

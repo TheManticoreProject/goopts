@@ -83,6 +83,41 @@ func (ag *ArgumentGroup) Register(arg arguments.Argument) error {
 	return nil
 }
 
+// ArgumentIsPresent checks if a given argument is present in the parsed arguments.
+// It supports both short (e.g., -e) and long (e.g., --example) argument names.
+//
+// Parameters:
+//   - argumentName: The name of the argument to check. It should start with a dash ('-')
+//     for short arguments or two dashes ('--') for long arguments.
+//
+// Returns:
+// - bool: true if the argument is present; false otherwise.
+//
+// The function first verifies that the argument name has a valid length and starts
+// with a dash. It then checks if the argument is in the `LongNameToArgument` map
+// for long arguments or `ShortNameToArgument` map for short arguments, returning
+// true if found and false if not.
+func (ag *ArgumentGroup) ArgumentIsPresent(argumentName string) bool {
+	if len(argumentName) < 2 || argumentName[0] != '-' {
+		return false
+	}
+
+	if argumentName[1] == '-' {
+		// Long argument flag (e.g., --example)
+		if argument, exists := ag.LongNameToArgument[argumentName]; exists {
+			return argument.IsPresent()
+		}
+	} else {
+		// Short argument flag (e.g., -e)
+		if argument, exists := ag.ShortNameToArgument[argumentName]; exists {
+			return argument.IsPresent()
+		}
+	}
+
+	// Argument not found
+	return false
+}
+
 // PrintArgumentTree prints the argument tree for the argument group.
 //
 // Parameters:

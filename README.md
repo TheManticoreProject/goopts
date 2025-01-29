@@ -86,7 +86,7 @@ var (
 
 func parseArgs() {
 	// Create a new arguments parser with a custom banner
-	ap := parser.ArgumentsParser{Banner: "PoC of goopts parsing v.1.1 - by @podalirius_"}
+	ap := parser.ArgumentsParser{Banner: "PoC of goopts parsing v.1.1 - by Remi GASCOU (Podalirius)"}
 
 	// Define positional arguments
 	ap.NewStringPositionalArgument(&filePath, "filepath", "Path to the input file.")
