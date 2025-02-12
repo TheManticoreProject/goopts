@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/p0dalirius/goopts/parser"
 )
@@ -31,6 +32,8 @@ type ArgumentsSubparser struct {
 	Name  string
 	Value *string
 
+	CaseInsensitive bool
+
 	SubParsers map[string]*parser.ArgumentsParser
 }
 
@@ -53,7 +56,11 @@ func (asp *ArgumentsSubparser) AddSubParser(name, banner string) *parser.Argumen
 		asp.SubParsers = make(map[string]*parser.ArgumentsParser)
 	}
 
-	asp.SubParsers[name] = parser_ptr
+	if asp.CaseInsensitive {
+		asp.SubParsers[strings.ToLower(name)] = parser_ptr
+	} else {
+		asp.SubParsers[name] = parser_ptr
+	}
 
 	return parser_ptr
 }
@@ -71,6 +78,9 @@ func (asp *ArgumentsSubparser) Parse() {
 		asp.Usage()
 	} else {
 		subparser_name := os.Args[1]
+		if asp.CaseInsensitive {
+			subparser_name = strings.ToLower(os.Args[1])
+		}
 		// Consume the program name and the subparser name
 		if subparser, exists := asp.SubParsers[subparser_name]; exists {
 			if asp.Value != nil {

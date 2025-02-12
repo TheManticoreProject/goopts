@@ -27,9 +27,10 @@ var (
 func parseArgs() {
 	// Create a new arguments parser with a custom banner
 	asp := subparser.ArgumentsSubparser{
-		Banner: "PoC of goopts parsing v.1.1 - by Remi GASCOU (Podalirius)",
-		Name:   "mode",
-		Value:  &mode,
+		Banner:          "PoC of goopts parsing v.1.1 - by Remi GASCOU (Podalirius)",
+		Name:            "mode",
+		Value:           &mode,
+		CaseInsensitive: true,
 	}
 
 	// Define positional subparsers
