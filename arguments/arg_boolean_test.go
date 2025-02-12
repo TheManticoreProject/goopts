@@ -79,7 +79,7 @@ func TestBoolArgument_Getters(t *testing.T) {
 		LongName:     "--verbose",
 		Help:         "Enable verbose mode",
 		Value:        &value,
-		DefaultValue: value,
+		DefaultValue: false,
 	}
 	arg.ResetDefaultValue()
 	arg.SetValue(value)

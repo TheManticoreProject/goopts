@@ -53,10 +53,9 @@ func TestStringArgument_Consume(t *testing.T) {
 func TestStringArgument_Consume_NoMatch(t *testing.T) {
 	value := "initial"
 	arg := StringArgument{
-		ShortName:    "-v",
-		LongName:     "--verbose",
-		Value:        &value,
-		DefaultValue: value,
+		ShortName: "-v",
+		LongName:  "--verbose",
+		Value:     &value,
 	}
 	arg.ResetDefaultValue()
 	arg.SetValue(value)
@@ -83,6 +82,7 @@ func TestStringArgument_Getters(t *testing.T) {
 		Required:     true,
 	}
 	arg.ResetDefaultValue()
+	arg.SetValue(value)
 
 	if arg.GetShortName() != "-v" {
 		t.Errorf("Expected ShortName to be '-v', got '%s'", arg.GetShortName())
