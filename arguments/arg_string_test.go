@@ -82,7 +82,7 @@ func TestStringArgument_Getters(t *testing.T) {
 		Required:     true,
 	}
 	arg.ResetDefaultValue()
-	arg.SetValue(value)
+	arg.SetValue("value")
 
 	if arg.GetShortName() != "-v" {
 		t.Errorf("Expected ShortName to be '-v', got '%s'", arg.GetShortName())

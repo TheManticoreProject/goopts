@@ -116,7 +116,6 @@ func TestTcpPortArgument_Consume_NoMatch(t *testing.T) {
 		DefaultValue: 8080,
 		Required:     true,
 	}
-	arg.ResetDefaultValue()
 
 	args := []string{"--other"}
 

@@ -99,7 +99,7 @@ func TestIntArgument_Getters(t *testing.T) {
 		Required:     true,
 	}
 	arg.ResetDefaultValue()
-	arg.SetValue(value)
+	arg.SetValue(10)
 
 	if arg.GetShortName() != "-n" {
 		t.Errorf("Expected ShortName to be '-n', got '%s'", arg.GetShortName())
