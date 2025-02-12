@@ -31,11 +31,13 @@ func TestStringArgument_Init(t *testing.T) {
 func TestStringArgument_Consume(t *testing.T) {
 	value := "initial"
 	arg := StringArgument{
-		ShortName: "-v",
-		LongName:  "--verbose",
-		Value:     &value,
+		ShortName:    "-v",
+		LongName:     "--verbose",
+		Value:        &value,
+		DefaultValue: value,
 	}
 	arg.ResetDefaultValue()
+	arg.SetValue(value)
 
 	arguments := []string{"-v", "testValue", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -51,11 +53,13 @@ func TestStringArgument_Consume(t *testing.T) {
 func TestStringArgument_Consume_NoMatch(t *testing.T) {
 	value := "initial"
 	arg := StringArgument{
-		ShortName: "-v",
-		LongName:  "--verbose",
-		Value:     &value,
+		ShortName:    "-v",
+		LongName:     "--verbose",
+		Value:        &value,
+		DefaultValue: value,
 	}
 	arg.ResetDefaultValue()
+	arg.SetValue(value)
 
 	arguments := []string{"-x", "testValue", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
