@@ -21,6 +21,9 @@ type Argument interface {
 	// This returns the actual value specified by the user during program execution.
 	GetValue() any
 
+	// SetValue sets the value of the argument.
+	SetValue(value any)
+
 	// GetDefaultValue returns the default value assigned to the argument.
 	// This value is used if the user does not provide an explicit value for the argument.
 	GetDefaultValue() any

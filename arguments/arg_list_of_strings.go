@@ -53,6 +53,12 @@ func (arg ListOfStringsArgument) GetValue() any {
 	return *arg.Value
 }
 
+// SetValue sets the value of the ListOfStringsArgument.
+// This is the list of strings provided by the user or set by default.
+func (arg *ListOfStringsArgument) SetValue(value any) {
+	*(arg.Value) = value.([]string)
+}
+
 // GetDefaultValue returns the default list of strings as an interface{}.
 // This is used when the argument is not specified by the user.
 func (arg ListOfStringsArgument) GetDefaultValue() any {

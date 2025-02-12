@@ -63,6 +63,12 @@ func (arg MapOfHttpHeadersArgument) GetDefaultValue() any {
 	return arg.DefaultValue
 }
 
+// SetValue sets the value of the MapOfHttpHeadersArgument.
+// This is the map of HTTP headers provided by the user or set by default.
+func (arg *MapOfHttpHeadersArgument) SetValue(value any) {
+	*(arg.Value) = value.(map[string]string)
+}
+
 // ResetDefaultValue resets the value of the argument to the default value.
 func (arg *MapOfHttpHeadersArgument) ResetDefaultValue() {
 	if (*arg.Value) == nil {

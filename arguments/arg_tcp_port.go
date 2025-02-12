@@ -61,6 +61,12 @@ func (arg TcpPortArgument) GetValue() any {
 	return *arg.Value
 }
 
+// SetValue sets the value of the TcpPortArgument.
+// This is the port number provided by the user or set by default.
+func (arg *TcpPortArgument) SetValue(value any) {
+	*(arg.Value) = value.(int)
+}
+
 // GetDefaultValue returns the default value of the TcpPortArgument.
 func (arg TcpPortArgument) GetDefaultValue() any {
 	return arg.DefaultValue

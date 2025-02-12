@@ -61,6 +61,12 @@ func (arg StringArgument) GetValue() any {
 	return *arg.Value
 }
 
+// SetValue sets the value of the StringArgument.
+// This is the string provided by the user or set by default.
+func (arg *StringArgument) SetValue(value any) {
+	*(arg.Value) = value.(string)
+}
+
 // GetDefaultValue returns the default value of the argument as an interface{}.
 // This is used when the argument is not specified by the user.
 func (arg StringArgument) GetDefaultValue() any {

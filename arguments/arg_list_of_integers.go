@@ -57,6 +57,12 @@ func (arg ListOfIntsArgument) GetValue() any {
 	return *arg.Value
 }
 
+// SetValue sets the value of the ListOfIntsArgument.
+// This is the list of integers provided by the user or set by default.
+func (arg *ListOfIntsArgument) SetValue(value any) {
+	*(arg.Value) = value.([]int)
+}
+
 // GetDefaultValue returns the default list of integers as an interface{}.
 // This is used when the argument is not specified by the user.
 func (arg ListOfIntsArgument) GetDefaultValue() any {

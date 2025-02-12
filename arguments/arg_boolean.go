@@ -55,6 +55,12 @@ func (arg BoolArgument) GetValue() any {
 	return *arg.Value
 }
 
+// SetValue sets the value of the BoolArgument.
+// This is the boolean provided by the user or set by default.
+func (arg *BoolArgument) SetValue(value any) {
+	*(arg.Value) = value.(bool)
+}
+
 // GetDefaultValue returns the default boolean value as an interface{}.
 // This is used when the argument is not specified by the user.
 func (arg BoolArgument) GetDefaultValue() any {

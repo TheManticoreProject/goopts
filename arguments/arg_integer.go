@@ -61,6 +61,12 @@ func (arg IntArgument) GetValue() any {
 	return *arg.Value
 }
 
+// SetValue sets the value of the IntArgument.
+// This is the integer provided by the user or set by default.
+func (arg *IntArgument) SetValue(value any) {
+	*(arg.Value) = value.(int)
+}
+
 // GetDefaultValue returns the default integer value as an interface{}.
 // This is used when the argument is not specified by the user.
 func (arg IntArgument) GetDefaultValue() any {
