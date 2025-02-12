@@ -63,6 +63,11 @@ func (arg ListOfIntsArgument) GetDefaultValue() any {
 	return arg.DefaultValue
 }
 
+// ResetDefaultValue resets the value of the argument to the default value.
+func (arg *ListOfIntsArgument) ResetDefaultValue() {
+	*(arg.Value) = append(*(arg.Value), arg.DefaultValue...)
+}
+
 // IsRequired returns whether the argument is required.
 // If true, the argument must be specified when running the program.
 func (arg ListOfIntsArgument) IsRequired() bool {
@@ -77,17 +82,7 @@ func (arg ListOfIntsArgument) IsPresent() bool {
 // Init initializes the ListOfIntsArgument with the provided parameters.
 // It sets the flag names, required status, help message, actual value, and default value.
 func (arg *ListOfIntsArgument) Init(value *[]int, shortName, longName string, defaultValue []int, required bool, help string) {
-	if len(shortName) == 0 {
-		arg.ShortName = ""
-	} else {
-		arg.ShortName = "-" + utils.StripLeftDashes(shortName)
-	}
-
-	if len(longName) == 0 {
-		arg.LongName = ""
-	} else {
-		arg.LongName = "--" + utils.StripLeftDashes(longName)
-	}
+	arg.LongName, arg.ShortName = utils.GenerateLongAndShortNames(longName, shortName)
 
 	arg.Required = required
 
@@ -96,7 +91,6 @@ func (arg *ListOfIntsArgument) Init(value *[]int, shortName, longName string, de
 	arg.Help = help
 
 	arg.Value = value
-	*(arg.Value) = append(*(arg.Value), defaultValue...)
 
 	arg.DefaultValue = defaultValue
 }

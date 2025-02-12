@@ -53,16 +53,6 @@ type ArgumentsParser struct {
 	allArguments        []arguments.Argument
 }
 
-func NewArgumentsParser(banner string) (ap *ArgumentsParser) {
-	ap = &ArgumentsParser{
-		Banner:           banner,
-		ShowBannerOnHelp: true,
-		ShowBannerOnRun:  true,
-	}
-
-	return ap
-}
-
 // ArgumentIsPresent checks if a given argument is present in the parsed arguments.
 // It supports both short (e.g., -e) and long (e.g., --example) argument names.
 //
@@ -187,19 +177,27 @@ func (ap *ArgumentsParser) populateMaps() {
 //
 //	If required arguments are missing or extra positional arguments are found, error messages
 //	will be displayed, and the program will exit with a non-zero status.
-func (ap *ArgumentsParser) Parse() {
+func (ap *ArgumentsParser) ParseFrom(index int) {
+	debug := false
+
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Calling populateMaps()\n", index)
+	}
 	ap.populateMaps()
 
-	if len(ap.Banner) != 0 {
+	if len(ap.Banner) != 0 && ap.ShowBannerOnRun {
 		fmt.Printf("%s\n\n", ap.Banner)
 	}
 
 	// Store error messages of parsing arguments
 	errorMessages := []string{}
 
-	// Prepare arguments and split on "="
+	// Prepare arguments and split on "=" for `--arg=value`
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Prepare arguments and split on \"=\" for `--arg=value`\n", index)
+	}
 	arguments := []string{}
-	for _, arg := range os.Args[1:] {
+	for _, arg := range os.Args[index:] {
 		if strings.Contains(arg, "=") && strings.HasPrefix(arg, "-") {
 			arguments = append(arguments, strings.SplitN(arg, "=", 2)...)
 		} else {
@@ -208,12 +206,26 @@ func (ap *ArgumentsParser) Parse() {
 	}
 
 	// Check if -h or --help are present
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Check if -h or --help are present\n", index)
+	}
 	if slices.Contains(arguments, "-h") || slices.Contains(arguments, "--help") {
 		ap.Usage()
 		os.Exit(0)
 	}
 
+	// Reset all arguments to their default values
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Reset all arguments to their default values\n", index)
+	}
+	for _, arg := range ap.allArguments {
+		arg.ResetDefaultValue()
+	}
+
 	// Split between positional arguments and other arguments
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Split between positional arguments and other arguments\n", index)
+	}
 	potentialPositionalArguments := []string{}
 	otherArguments := []string{}
 	parsingPositionalArguments := true
@@ -229,6 +241,9 @@ func (ap *ArgumentsParser) Parse() {
 	}
 
 	// Parse the positional arguments first
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Parse the positional arguments first\n", index)
+	}
 	missingPositionalArguments := []string{}
 	for k, posarg := range ap.PositionalArguments {
 		if k < len(potentialPositionalArguments) {
@@ -264,10 +279,19 @@ func (ap *ArgumentsParser) Parse() {
 	}
 
 	// Parse all other arguments
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Parse all other arguments\n", index)
+	}
 	for k, otherarg := range otherArguments {
 		if strings.HasPrefix(otherarg, "--") {
 			// Long flag name
+			if debug {
+				fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] | Processing argument with long name: [%s]\n", index, otherarg)
+			}
 			if _, exists := ap.longNameToArgument[otherarg]; exists {
+				if debug {
+					fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] |  | Argument exists, consuming argument.\n", index)
+				}
 				arg := ap.longNameToArgument[otherarg]
 				_, err := arg.Consume(otherArguments[k:])
 				if err != nil {
@@ -276,7 +300,13 @@ func (ap *ArgumentsParser) Parse() {
 			}
 		} else if strings.HasPrefix(otherarg, "-") {
 			// Short flag name
+			if debug {
+				fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] | Processing argument with short name: [%s]\n", index, otherarg)
+			}
 			if _, exists := ap.shortNameToArgument[otherarg]; exists {
+				if debug {
+					fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] |  | Argument exists, consuming argument.\n", index)
+				}
 				arg := ap.shortNameToArgument[otherarg]
 				_, err := arg.Consume(otherArguments[k:])
 				if err != nil {
@@ -287,6 +317,9 @@ func (ap *ArgumentsParser) Parse() {
 	}
 
 	// Check if all required arguments have been parsed
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Check if all required arguments have been parsed\n", index)
+	}
 	requiredArgumentsMissing := []string{}
 	for _, arg := range ap.requiredArguments {
 		if !arg.IsPresent() {
@@ -301,7 +334,10 @@ func (ap *ArgumentsParser) Parse() {
 		}
 	}
 
-	// Check if all required arguments have been parsed
+	// Check if all required arguments in groups have been parsed
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Check if all required arguments in groups have been parsed\n", index)
+	}
 	for _, group := range ap.Groups {
 		argumentsPresent := []string{}
 		argumentsMissing := []string{}
@@ -342,12 +378,28 @@ func (ap *ArgumentsParser) Parse() {
 	}
 
 	if len(errorMessages) != 0 {
-		ap.Usage()
+		if debug {
+			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Error messages found, printing usage and exiting\n", index)
+		}
+		ap.UsageFrom(index)
 		for _, errmsg := range errorMessages {
 			fmt.Printf("[!] %s\n", errmsg)
 		}
 		os.Exit(1)
 	}
+
+	if debug {
+		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] No errors found, arguments are parsed!\n", index)
+	}
+}
+
+// Parse parses the arguments and returns the parsed arguments.
+//
+// Returns:
+// - A map of parsed arguments.
+func (ap *ArgumentsParser) Parse() {
+	// We start parsing from index 1 because the first argument (0) is the program name
+	ap.ParseFrom(1)
 }
 
 // Get retrieves the value of the argument specified by its short or long name.
@@ -395,9 +447,14 @@ func (ap *ArgumentsParser) Get(argumentFlag string) (interface{}, error) {
 //
 // The function ensures that the usage information is displayed in a clear and organized manner, making it easy for users to understand
 // the available command-line arguments and their descriptions.
-func (ap *ArgumentsParser) Usage() {
+func (ap *ArgumentsParser) UsageFrom(index int) {
 	// Create usage string
 	usage := filepath.Base(os.Args[0])
+	if index != 0 {
+		for k := range index - 1 {
+			usage += " " + os.Args[k+1]
+		}
+	}
 
 	// Append positional arguments
 	for _, posarg := range ap.PositionalArguments {
@@ -455,6 +512,13 @@ func (ap *ArgumentsParser) Usage() {
 	}
 
 	fmt.Printf("\n")
+}
+
+// Usage prints the usage information for the command-line arguments.
+func (ap *ArgumentsParser) Usage() {
+	// We start printing from index 0 because the first argument (0)
+	// is the program name and we need it in the usage
+	ap.UsageFrom(0)
 }
 
 // generateArgumentForUsageLine generates a formatted string representing a command-line argument

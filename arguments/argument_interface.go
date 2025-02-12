@@ -25,6 +25,9 @@ type Argument interface {
 	// This value is used if the user does not provide an explicit value for the argument.
 	GetDefaultValue() any
 
+	// ResetDefaultValue resets the value of the argument to the default value.
+	ResetDefaultValue()
+
 	// IsRequired checks if the argument is marked as required.
 	// If true, the program will enforce that this argument must be provided
 	// by the user, otherwise an error will be thrown.

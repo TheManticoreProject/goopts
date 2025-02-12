@@ -71,6 +71,11 @@ func (arg IntRangeArgument) GetDefaultValue() any {
 	return arg.DefaultValue
 }
 
+// ResetDefaultValue resets the value of the argument to the default value.
+func (arg *IntRangeArgument) ResetDefaultValue() {
+	*(arg.Value) = arg.DefaultValue
+}
+
 // IsRequired returns whether the argument is required.
 // If true, the argument must be specified when running the program.
 func (arg IntRangeArgument) IsRequired() bool {
@@ -85,17 +90,7 @@ func (arg IntRangeArgument) IsPresent() bool {
 // Init initializes the IntRangeArgument with the provided parameters.
 // It sets the flag names, required status, help message, actual value, and default value.
 func (arg *IntRangeArgument) Init(value *int, shortName, longName string, defaultValue, rangeStart, rangeStop int, required bool, help string) {
-	if len(shortName) == 0 {
-		arg.ShortName = ""
-	} else {
-		arg.ShortName = "-" + utils.StripLeftDashes(shortName)
-	}
-
-	if len(longName) == 0 {
-		arg.LongName = ""
-	} else {
-		arg.LongName = "--" + utils.StripLeftDashes(longName)
-	}
+	arg.LongName, arg.ShortName = utils.GenerateLongAndShortNames(longName, shortName)
 
 	arg.Required = required
 
@@ -104,7 +99,6 @@ func (arg *IntRangeArgument) Init(value *int, shortName, longName string, defaul
 	arg.Help = help
 
 	arg.Value = value
-	*(arg.Value) = defaultValue
 
 	arg.DefaultValue = defaultValue
 

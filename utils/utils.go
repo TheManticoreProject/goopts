@@ -24,6 +24,31 @@ func StripLeftDashes(s string) string {
 	return s
 }
 
+// GenerateLongAndShortNames generates the long and short names for an argument.
+//
+// Parameters:
+//   - longName (string): The long name of the argument.
+//   - shortName (string): The short name of the argument.
+//
+// Returns:
+//   - string: The long name of the argument.
+//   - string: The short name of the argument.
+func GenerateLongAndShortNames(longName, shortName string) (string, string) {
+	if len(shortName) == 0 {
+		shortName = ""
+	} else {
+		shortName = "-" + StripLeftDashes(shortName)
+	}
+
+	if len(longName) == 0 {
+		longName = ""
+	} else {
+		longName = "--" + StripLeftDashes(longName)
+	}
+
+	return longName, shortName
+}
+
 // ListOfStrings converts a slice of strings into a formatted string representation.
 // Each element of the slice is enclosed in double quotes and separated by commas.
 // The entire output is enclosed in square brackets, mimicking a JSON-style array.

@@ -66,6 +66,11 @@ func (arg TcpPortArgument) GetDefaultValue() any {
 	return arg.DefaultValue
 }
 
+// ResetDefaultValue resets the value of the argument to the default value.
+func (arg *TcpPortArgument) ResetDefaultValue() {
+	*(arg.Value) = arg.DefaultValue
+}
+
 // IsRequired checks if the TcpPortArgument is marked as required.
 func (arg TcpPortArgument) IsRequired() bool {
 	return arg.Required
@@ -86,17 +91,7 @@ func (arg TcpPortArgument) IsPresent() bool {
 //   - required (bool): Indicates whether the argument is required.
 //   - help (string): Help message to describe the argument.
 func (arg *TcpPortArgument) Init(value *int, shortName, longName string, defaultValue int, required bool, help string) {
-	if len(shortName) == 0 {
-		arg.ShortName = ""
-	} else {
-		arg.ShortName = "-" + utils.StripLeftDashes(shortName)
-	}
-
-	if len(longName) == 0 {
-		arg.LongName = ""
-	} else {
-		arg.LongName = "--" + utils.StripLeftDashes(longName)
-	}
+	arg.LongName, arg.ShortName = utils.GenerateLongAndShortNames(longName, shortName)
 
 	arg.Required = required
 
@@ -105,7 +100,6 @@ func (arg *TcpPortArgument) Init(value *int, shortName, longName string, default
 	arg.Help = help
 
 	arg.Value = value
-	*(arg.Value) = defaultValue
 
 	arg.DefaultValue = defaultValue
 }

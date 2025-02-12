@@ -61,6 +61,11 @@ func (arg BoolArgument) GetDefaultValue() any {
 	return arg.DefaultValue
 }
 
+// ResetDefaultValue resets the value of the argument to the default value.
+func (arg *BoolArgument) ResetDefaultValue() {
+	*(arg.Value) = arg.DefaultValue
+}
+
 // IsRequired returns whether the argument is required.
 // If true, the argument must be specified when running the program.
 func (arg BoolArgument) IsRequired() bool {
@@ -75,24 +80,13 @@ func (arg BoolArgument) IsPresent() bool {
 // Init initializes the BoolArgument with the provided parameters.
 // It sets the flag names, help message, actual value, and default value.
 func (arg *BoolArgument) Init(value *bool, shortName, longName string, defaultValue bool, help string) {
-	if len(shortName) == 0 {
-		arg.ShortName = ""
-	} else {
-		arg.ShortName = "-" + utils.StripLeftDashes(shortName)
-	}
-
-	if len(longName) == 0 {
-		arg.LongName = ""
-	} else {
-		arg.LongName = "--" + utils.StripLeftDashes(longName)
-	}
+	arg.LongName, arg.ShortName = utils.GenerateLongAndShortNames(longName, shortName)
 
 	arg.Help = help
 
 	arg.Present = false
 
 	arg.Value = value
-	*(arg.Value) = defaultValue
 
 	arg.DefaultValue = defaultValue
 }

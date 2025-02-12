@@ -67,6 +67,11 @@ func (arg StringArgument) GetDefaultValue() any {
 	return arg.DefaultValue
 }
 
+// ResetDefaultValue resets the value of the argument to the default value.
+func (arg *StringArgument) ResetDefaultValue() {
+	*(arg.Value) = arg.DefaultValue
+}
+
 // IsRequired returns whether the argument is required.
 // If true, the argument must be specified when running the program.
 func (arg StringArgument) IsRequired() bool {
@@ -93,17 +98,7 @@ func (arg StringArgument) IsPresent() bool {
 // The function uses the utils.StripLeftDashes function to remove any leading dashes from the short name and long name
 // before adding a single dash for the short name and a double dash for the long name.
 func (arg *StringArgument) Init(value *string, shortName, longName string, defaultValue string, required bool, help string) {
-	if len(shortName) == 0 {
-		arg.ShortName = ""
-	} else {
-		arg.ShortName = "-" + utils.StripLeftDashes(shortName)
-	}
-
-	if len(longName) == 0 {
-		arg.LongName = ""
-	} else {
-		arg.LongName = "--" + utils.StripLeftDashes(longName)
-	}
+	arg.LongName, arg.ShortName = utils.GenerateLongAndShortNames(longName, shortName)
 
 	arg.Required = required
 
@@ -112,7 +107,6 @@ func (arg *StringArgument) Init(value *string, shortName, longName string, defau
 	arg.Help = help
 
 	arg.Value = value
-	*(arg.Value) = defaultValue
 
 	arg.DefaultValue = defaultValue
 }

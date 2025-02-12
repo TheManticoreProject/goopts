@@ -63,6 +63,16 @@ func (arg MapOfHttpHeadersArgument) GetDefaultValue() any {
 	return arg.DefaultValue
 }
 
+// ResetDefaultValue resets the value of the argument to the default value.
+func (arg *MapOfHttpHeadersArgument) ResetDefaultValue() {
+	if (*arg.Value) == nil {
+		(*arg.Value) = make(map[string]string, 0)
+	}
+	for key, value := range arg.DefaultValue {
+		(*arg.Value)[key] = value
+	}
+}
+
 // IsRequired returns whether the argument is required.
 // If true, the argument must be specified when running the program.
 func (arg MapOfHttpHeadersArgument) IsRequired() bool {
@@ -89,17 +99,7 @@ func (arg MapOfHttpHeadersArgument) IsPresent() bool {
 // The function uses the utils.StripLeftDashes function to remove any leading dashes from the short name and long name
 // before adding a single dash for the short name and a double dash for the long name.
 func (arg *MapOfHttpHeadersArgument) Init(value *map[string]string, shortName, longName string, defaultValue map[string]string, required bool, help string) {
-	if len(shortName) == 0 {
-		arg.ShortName = ""
-	} else {
-		arg.ShortName = "-" + utils.StripLeftDashes(shortName)
-	}
-
-	if len(longName) == 0 {
-		arg.LongName = ""
-	} else {
-		arg.LongName = "--" + utils.StripLeftDashes(longName)
-	}
+	arg.LongName, arg.ShortName = utils.GenerateLongAndShortNames(longName, shortName)
 
 	arg.Required = required
 
@@ -108,12 +108,6 @@ func (arg *MapOfHttpHeadersArgument) Init(value *map[string]string, shortName, l
 	arg.Help = help
 
 	arg.Value = value
-	if (*arg.Value) == nil {
-		(*arg.Value) = make(map[string]string, 0)
-	}
-	for key, value := range defaultValue {
-		(*arg.Value)[key] = value
-	}
 
 	arg.DefaultValue = defaultValue
 }
