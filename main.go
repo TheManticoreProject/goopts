@@ -7,6 +7,8 @@ import (
 )
 
 var (
+	mode string
+
 	// Positional arguments
 	filePath          string
 	outputFolder      string
@@ -27,6 +29,7 @@ func parseArgs() {
 	asp := subparser.ArgumentsSubparser{
 		Banner: "PoC of goopts parsing v.1.1 - by Remi GASCOU (Podalirius)",
 		Name:   "mode",
+		Value:  &mode,
 	}
 
 	// Define positional subparsers
@@ -64,20 +67,22 @@ func parseArgs() {
 func main() {
 	parseArgs()
 
-	fmt.Printf("recon\n")
-	fmt.Printf("| filePath: %s\n", filePath)
-	fmt.Printf("| outputFolder: %s\n", outputFolder)
-	fmt.Printf("| enableLogging: %t\n", enableLogging)
-	fmt.Printf("| disableEncryption: %t\n", disableEncryption)
-	fmt.Printf("| dbHost: %s\n", dbHost)
-	fmt.Printf("| dbUsername: %s\n", dbUsername)
-	fmt.Printf("| dbPassword: %s\n", dbPassword)
-	fmt.Printf("| dbPort: %d\n", dbPort)
-	fmt.Printf("| serverIP: %s\n", serverIP)
-	fmt.Printf("| serverPort: %d\n", serverPort)
+	fmt.Printf("mode: %s\n\n", mode)
 
-	fmt.Printf("scan\n")
-	fmt.Printf("| filePath: %s\n", filePath)
-	fmt.Printf("| serverIP: %s\n", serverIP)
-	fmt.Printf("| serverPort: %d\n", serverPort)
+	fmt.Printf("[+] recon\n")
+	fmt.Printf("  | filePath: %s\n", filePath)
+	fmt.Printf("  | outputFolder: %s\n", outputFolder)
+	fmt.Printf("  | enableLogging: %t\n", enableLogging)
+	fmt.Printf("  | disableEncryption: %t\n", disableEncryption)
+	fmt.Printf("  | dbHost: %s\n", dbHost)
+	fmt.Printf("  | dbUsername: %s\n", dbUsername)
+	fmt.Printf("  | dbPassword: %s\n", dbPassword)
+	fmt.Printf("  | dbPort: %d\n", dbPort)
+	fmt.Printf("  | serverIP: %s\n", serverIP)
+	fmt.Printf("  | serverPort: %d\n\n", serverPort)
+
+	fmt.Printf("[+] scan\n")
+	fmt.Printf("  | filePath: %s\n", filePath)
+	fmt.Printf("  | serverIP: %s\n", serverIP)
+	fmt.Printf("  | serverPort: %d\n", serverPort)
 }

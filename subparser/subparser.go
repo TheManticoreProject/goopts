@@ -28,7 +28,8 @@ type ArgumentsSubparser struct {
 	ShowBannerOnHelp bool
 	ShowBannerOnRun  bool
 
-	Name string
+	Name  string
+	Value *string
 
 	SubParsers map[string]*parser.ArgumentsParser
 }
@@ -68,19 +69,23 @@ func (asp *ArgumentsSubparser) Parse() {
 
 	if len(os.Args) < 2 {
 		asp.Usage()
-	}
-	subparser_name := os.Args[1]
-	// Consume the program name and the subparser name
-	if subparser, exists := asp.SubParsers[subparser_name]; exists {
-		subparser.ParseFrom(2)
 	} else {
-		asp.Usage()
-		if len(asp.Name) != 0 {
-			fmt.Printf("[!] No %s with name '%s' found.\n", asp.Name, subparser_name)
+		subparser_name := os.Args[1]
+		// Consume the program name and the subparser name
+		if subparser, exists := asp.SubParsers[subparser_name]; exists {
+			if asp.Value != nil {
+				*asp.Value = subparser_name
+			}
+			subparser.ParseFrom(2)
 		} else {
-			fmt.Printf("[!] No subparser with name '%s' found.\n", subparser_name)
+			asp.Usage()
+			if len(asp.Name) != 0 {
+				fmt.Printf("[!] No %s with name '%s' found.\n", asp.Name, subparser_name)
+			} else {
+				fmt.Printf("[!] No subparser with name '%s' found.\n", subparser_name)
+			}
+			os.Exit(1)
 		}
-		os.Exit(1)
 	}
 }
 
