@@ -9,6 +9,7 @@ func TestIntArgument_Init(t *testing.T) {
 
 	arg := IntArgument{}
 	arg.Init(&value, "n", "number", 10, true, "This is a help message")
+	arg.ResetDefaultValue()
 
 	if arg.ShortName != "-n" {
 		t.Errorf("Expected ShortName to be '-n', got '%s'", arg.ShortName)
@@ -34,6 +35,7 @@ func TestIntArgument_Consume(t *testing.T) {
 		LongName:  "--number",
 		Value:     &value,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-n", "42", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -53,6 +55,7 @@ func TestIntArgument_Consume_InvalidInput(t *testing.T) {
 		LongName:  "--number",
 		Value:     &value,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-n", "notAnInt", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -72,6 +75,7 @@ func TestIntArgument_Consume_NoMatch(t *testing.T) {
 		LongName:  "--number",
 		Value:     &value,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-x", "42", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -94,6 +98,7 @@ func TestIntArgument_Getters(t *testing.T) {
 		DefaultValue: 100,
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	if arg.GetShortName() != "-n" {
 		t.Errorf("Expected ShortName to be '-n', got '%s'", arg.GetShortName())

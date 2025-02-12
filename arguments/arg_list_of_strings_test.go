@@ -11,6 +11,7 @@ func TestListOfStringsArgument_Init(t *testing.T) {
 
 	arg := ListOfStringsArgument{}
 	arg.Init(&values, "s", "strings", []string{"default1", "default2"}, true, "List of strings")
+	arg.ResetDefaultValue()
 
 	if arg.ShortName != "-s" {
 		t.Errorf("Expected ShortName to be '-s', got '%s'", arg.ShortName)
@@ -39,6 +40,7 @@ func TestListOfStringsArgument_Consume(t *testing.T) {
 		LongName:  "--strings",
 		Value:     &values,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-s", "example", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -58,6 +60,7 @@ func TestListOfStringsArgument_Consume_Multiple(t *testing.T) {
 		LongName:  "--strings",
 		Value:     &values,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-s", "example1", "-s", "example2", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -78,6 +81,7 @@ func TestListOfStringsArgument_Consume_NoMatch(t *testing.T) {
 		LongName:  "--strings",
 		Value:     &values,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-x", "example", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -100,6 +104,7 @@ func TestListOfStringsArgument_Getters(t *testing.T) {
 		DefaultValue: []string{"default1", "default2"},
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	if arg.GetShortName() != "-s" {
 		t.Errorf("Expected ShortName to be '-s', got '%s'", arg.GetShortName())

@@ -9,6 +9,7 @@ func TestStringArgument_Init(t *testing.T) {
 
 	arg := StringArgument{}
 	arg.Init(&value, "v", "verbose", "defaultValue", true, "This is a help message")
+	arg.ResetDefaultValue()
 
 	if arg.ShortName != "-v" {
 		t.Errorf("Expected ShortName to be '-v', got '%s'", arg.ShortName)
@@ -34,6 +35,7 @@ func TestStringArgument_Consume(t *testing.T) {
 		LongName:  "--verbose",
 		Value:     &value,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-v", "testValue", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -53,6 +55,7 @@ func TestStringArgument_Consume_NoMatch(t *testing.T) {
 		LongName:  "--verbose",
 		Value:     &value,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-x", "testValue", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -75,6 +78,7 @@ func TestStringArgument_Getters(t *testing.T) {
 		DefaultValue: "defaultValue",
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	if arg.GetShortName() != "-v" {
 		t.Errorf("Expected ShortName to be '-v', got '%s'", arg.GetShortName())

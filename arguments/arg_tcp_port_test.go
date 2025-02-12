@@ -8,8 +8,8 @@ import (
 func TestTcpPortArgument_Init(t *testing.T) {
 	var value int
 	arg := TcpPortArgument{}
-
 	arg.Init(&value, "p", "port", 8080, true, "Port to connect to")
+	arg.ResetDefaultValue()
 
 	if arg.ShortName != "-p" {
 		t.Errorf("Expected short name '-p', got '%s'", arg.ShortName)
@@ -41,6 +41,7 @@ func TestTcpPortArgument_Consume_ValidPort(t *testing.T) {
 		DefaultValue: 8080,
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	args := []string{"-p", "9090"}
 
@@ -67,6 +68,7 @@ func TestTcpPortArgument_Consume_InvalidPort(t *testing.T) {
 		DefaultValue: 8080,
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	args := []string{"-p", "70000"}
 
@@ -90,6 +92,7 @@ func TestTcpPortArgument_Consume_InvalidValue(t *testing.T) {
 		DefaultValue: 8080,
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	args := []string{"-p", "invalid"}
 
@@ -113,6 +116,7 @@ func TestTcpPortArgument_Consume_NoMatch(t *testing.T) {
 		DefaultValue: 8080,
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	args := []string{"--other"}
 

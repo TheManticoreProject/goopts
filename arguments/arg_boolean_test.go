@@ -9,6 +9,7 @@ func TestBoolArgument_Init(t *testing.T) {
 
 	arg := BoolArgument{}
 	arg.Init(&value, "v", "verbose", false, "Enable verbose mode")
+	arg.ResetDefaultValue()
 
 	if arg.ShortName != "-v" {
 		t.Errorf("Expected ShortName to be '-v', got '%s'", arg.ShortName)
@@ -35,6 +36,7 @@ func TestBoolArgument_Consume(t *testing.T) {
 		Value:        &value,
 		DefaultValue: false,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-v", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -55,6 +57,7 @@ func TestBoolArgument_Consume_NoMatch(t *testing.T) {
 		Value:        &value,
 		DefaultValue: false,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-x", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -76,6 +79,7 @@ func TestBoolArgument_Getters(t *testing.T) {
 		Value:        &value,
 		DefaultValue: false,
 	}
+	arg.ResetDefaultValue()
 
 	if arg.GetShortName() != "-v" {
 		t.Errorf("Expected ShortName to be '-v', got '%s'", arg.GetShortName())

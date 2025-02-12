@@ -8,6 +8,7 @@ func TestIntRangeArgument_Init(t *testing.T) {
 	var value int
 	arg := IntRangeArgument{}
 	arg.Init(&value, "i", "integer", 10, 1, 100, true, "Test integer argument")
+	arg.ResetDefaultValue()
 
 	if arg.GetShortName() != "-i" {
 		t.Errorf("Expected short name '-i', got '%s'", arg.GetShortName())
@@ -30,6 +31,7 @@ func TestIntRangeArgument_Consume_Valid(t *testing.T) {
 	var value int
 	arg := IntRangeArgument{}
 	arg.Init(&value, "i", "integer", 10, 1, 100, true, "Test integer argument")
+	arg.ResetDefaultValue()
 
 	args := []string{"-i", "50"}
 	remainingArgs, err := arg.Consume(args)
@@ -49,6 +51,7 @@ func TestIntRangeArgument_Consume_OutOfRange(t *testing.T) {
 	var value int
 	arg := IntRangeArgument{}
 	arg.Init(&value, "i", "integer", 10, 1, 100, true, "Test integer argument")
+	arg.ResetDefaultValue()
 
 	args := []string{"-i", "150"}
 	remainingArgs, err := arg.Consume(args)
@@ -68,6 +71,7 @@ func TestIntRangeArgument_Consume_InvalidInteger(t *testing.T) {
 	var value int
 	arg := IntRangeArgument{}
 	arg.Init(&value, "i", "integer", 10, 1, 100, true, "Test integer argument")
+	arg.ResetDefaultValue()
 
 	args := []string{"-i", "notAnInteger"}
 	remainingArgs, err := arg.Consume(args)

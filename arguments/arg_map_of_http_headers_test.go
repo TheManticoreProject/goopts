@@ -8,8 +8,8 @@ import (
 func TestMapOfHttpHeadersArgument_Init(t *testing.T) {
 	var value map[string]string
 	arg := MapOfHttpHeadersArgument{}
-
 	arg.Init(&value, "h", "headers", map[string]string{"Content-Type": "application/json"}, true, "Help message for headers")
+	arg.ResetDefaultValue()
 
 	if arg.ShortName != "-h" {
 		t.Errorf("Expected short name '-h', got '%s'", arg.ShortName)
@@ -41,6 +41,7 @@ func TestMapOfHttpHeadersArgument_Consume(t *testing.T) {
 		DefaultValue: map[string]string{},
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	args := []string{"-h", "Authorization: Bearer token"}
 
@@ -67,6 +68,7 @@ func TestMapOfHttpHeadersArgument_Consume_MissingValue(t *testing.T) {
 		DefaultValue: map[string]string{},
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	args := []string{"-h", "Authorization"}
 
@@ -93,6 +95,7 @@ func TestMapOfHttpHeadersArgument_Consume_NoMatch(t *testing.T) {
 		DefaultValue: map[string]string{},
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	args := []string{"--other"}
 

@@ -11,6 +11,7 @@ func TestListOfIntsArgument_Init(t *testing.T) {
 
 	arg := ListOfIntsArgument{}
 	arg.Init(&values, "n", "numbers", []int{1, 2, 3}, true, "List of numbers")
+	arg.ResetDefaultValue()
 
 	if arg.ShortName != "-n" {
 		t.Errorf("Expected ShortName to be '-n', got '%s'", arg.ShortName)
@@ -39,6 +40,7 @@ func TestListOfIntsArgument_Consume(t *testing.T) {
 		LongName:  "--numbers",
 		Value:     &values,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-n", "42", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -58,6 +60,7 @@ func TestListOfIntsArgument_Consume_Multiple(t *testing.T) {
 		LongName:  "--numbers",
 		Value:     &values,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-n", "42", "-n", "100", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -78,6 +81,7 @@ func TestListOfIntsArgument_Consume_NoMatch(t *testing.T) {
 		LongName:  "--numbers",
 		Value:     &values,
 	}
+	arg.ResetDefaultValue()
 
 	arguments := []string{"-x", "42", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
@@ -100,6 +104,7 @@ func TestListOfIntsArgument_Getters(t *testing.T) {
 		DefaultValue: []int{1, 2, 3},
 		Required:     true,
 	}
+	arg.ResetDefaultValue()
 
 	if arg.GetShortName() != "-n" {
 		t.Errorf("Expected ShortName to be '-n', got '%s'", arg.GetShortName())
