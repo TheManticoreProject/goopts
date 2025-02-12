@@ -82,7 +82,7 @@ func TestBoolArgument_Getters(t *testing.T) {
 		DefaultValue: false,
 	}
 	arg.ResetDefaultValue()
-	arg.SetValue(value)
+	arg.SetValue(true)
 
 	if arg.GetShortName() != "-v" {
 		t.Errorf("Expected ShortName to be '-v', got '%s'", arg.GetShortName())

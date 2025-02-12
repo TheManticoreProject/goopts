@@ -58,7 +58,7 @@ func TestStringArgument_Consume_NoMatch(t *testing.T) {
 		Value:     &value,
 	}
 	arg.ResetDefaultValue()
-	arg.SetValue(value)
+	arg.SetValue("initial")
 
 	arguments := []string{"-x", "testValue", "anotherArg"}
 	remainingArgs, _ := arg.Consume(arguments)
