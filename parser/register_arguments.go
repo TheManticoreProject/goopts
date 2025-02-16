@@ -29,15 +29,19 @@ func (ap *ArgumentsParser) Register(arg arguments.Argument) error {
 		ap.DefaultGroup.LongNameToArgument = make(map[string]arguments.Argument)
 	}
 
-	if _, exists := ap.DefaultGroup.ShortNameToArgument[arg.GetShortName()]; exists {
-		return fmt.Errorf("argument with short name %s already exists", arg.GetShortName())
+	if len(arg.GetShortName()) != 0 {
+		if _, exists := ap.DefaultGroup.ShortNameToArgument[arg.GetShortName()]; exists {
+			return fmt.Errorf("argument with short name %s already exists", arg.GetShortName())
+		}
+		ap.DefaultGroup.ShortNameToArgument[arg.GetShortName()] = arg
 	}
-	ap.DefaultGroup.ShortNameToArgument[arg.GetShortName()] = arg
 
-	if _, exists := ap.DefaultGroup.LongNameToArgument[arg.GetLongName()]; exists {
-		return fmt.Errorf("argument with long name %s already exists", arg.GetLongName())
+	if len(arg.GetLongName()) != 0 {
+		if _, exists := ap.DefaultGroup.LongNameToArgument[arg.GetLongName()]; exists {
+			return fmt.Errorf("argument with long name %s already exists", arg.GetLongName())
+		}
+		ap.DefaultGroup.LongNameToArgument[arg.GetLongName()] = arg
 	}
-	ap.DefaultGroup.LongNameToArgument[arg.GetLongName()] = arg
 
 	ap.DefaultGroup.Arguments = append(ap.DefaultGroup.Arguments, arg)
 	return nil
