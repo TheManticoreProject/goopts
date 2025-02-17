@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/p0dalirius/goopts/parser"
@@ -113,13 +114,23 @@ func (asp *ArgumentsSubparser) Usage() {
 	if len(asp.SubParsers) != 0 {
 		fmt.Printf("\n")
 
+		// Compute format string for subparser names
 		max_len_subparser_string := 0
-		for name, _ := range asp.SubParsers {
+		for name := range asp.SubParsers {
 			max_len_subparser_string = max(max_len_subparser_string, len(name))
 		}
-
 		fmtString := fmt.Sprintf("  %%-%ds %%s\n", max_len_subparser_string+2)
-		for name, subparser := range asp.SubParsers {
+
+		// Sort subparser names
+		subparserNames := make([]string, 0, len(asp.SubParsers))
+		for name := range asp.SubParsers {
+			subparserNames = append(subparserNames, name)
+		}
+		sort.Strings(subparserNames)
+
+		// Print subparser names and banners
+		for _, name := range subparserNames {
+			subparser := asp.SubParsers[name]
 			fmt.Printf(fmtString, name, subparser.Banner)
 		}
 	}
