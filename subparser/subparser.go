@@ -77,6 +77,7 @@ func (asp *ArgumentsSubparser) Parse() {
 
 	if len(os.Args) < 2 {
 		asp.Usage()
+		os.Exit(1)
 	} else {
 		subparser_name := os.Args[1]
 		if asp.CaseInsensitive {
