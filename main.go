@@ -35,10 +35,11 @@ func parseArgs() {
 
 	// Define positional subparsers
 	subparser_recon := asp.AddSubParser("recon", "Reconnaissance mode.")
+	subparser_recon.NewBoolArgument(&enableLogging, "", "--enable-logging", true, "Enable logging during execution.")
+	subparser_recon.NewBoolArgument(&disableEncryption, "", "--disable-encryption", false, "Disable encryption for data transfer.")
 	subparser_recon.NewStringArgument(&filePath, "f", "file", "The file to recon.", true, "The file to recon.")
 	subparser_recon.NewStringArgument(&outputFolder, "o", "output", "The output folder.", true, "The output folder.")
-	subparser_recon.NewBoolArgument(&enableLogging, "-l", "--enable-logging", true, "Enable logging during execution.")
-	subparser_recon.NewBoolArgument(&disableEncryption, "-e", "--disable-encryption", false, "Disable encryption for data transfer.")
+
 	// Define an argument group for database authentication
 	group_dbAuth, err := subparser_recon.NewArgumentGroup("Database Authentication")
 	if err != nil {
@@ -60,6 +61,10 @@ func parseArgs() {
 		group_serverSettings.NewStringArgument(&serverIP, "-i", "--server-ip", "", true, "IP address of the server to connect.")
 		group_serverSettings.NewTcpPortArgument(&serverPort, "-s", "--server-port", 8080, false, "Port on which the server listens.")
 	}
+
+	// Define positional subparsers
+	subparser_add := asp.AddSubParser("add", "Add mode.")
+	subparser_add.NewStringArgument(&filePath, "f", "file", "The file to add.", true, "The file to add.")
 
 	// Parse the flags
 	asp.Parse()
