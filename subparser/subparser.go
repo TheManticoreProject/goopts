@@ -79,10 +79,18 @@ func (asp *ArgumentsSubparser) Parse() {
 		asp.Usage()
 		os.Exit(1)
 	} else {
+		// Get the subparser name from the first argument
 		subparser_name := os.Args[1]
 		if asp.CaseInsensitive {
 			subparser_name = strings.ToLower(os.Args[1])
 		}
+
+		// Check if the user wants to see the help message
+		if subparser_name == "help" || subparser_name == "--help" || subparser_name == "-h" {
+			asp.Usage()
+			os.Exit(0)
+		}
+
 		// Consume the program name and the subparser name
 		if subparser, exists := asp.SubParsers[subparser_name]; exists {
 			if asp.Value != nil {
