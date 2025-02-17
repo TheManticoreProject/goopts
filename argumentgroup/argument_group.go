@@ -69,14 +69,20 @@ func (ag *ArgumentGroup) Register(arg arguments.Argument) error {
 		ag.LongNameToArgument = make(map[string]arguments.Argument)
 	}
 
-	if _, exists := ag.ShortNameToArgument[arg.GetShortName()]; exists {
-		return fmt.Errorf("argument with short name %s already exists", arg.GetShortName())
+	if len(arg.GetShortName()) != 0 {
+		if _, exists := ag.ShortNameToArgument[arg.GetShortName()]; exists {
+			return fmt.Errorf("argument with short name %s already exists", arg.GetShortName())
+		}
+		ag.ShortNameToArgument[arg.GetShortName()] = arg
 	}
-	ag.ShortNameToArgument[arg.GetShortName()] = arg
 
-	if _, exists := ag.LongNameToArgument[arg.GetLongName()]; exists {
-		return fmt.Errorf("argument with long name %s already exists", arg.GetLongName())
+	if len(arg.GetLongName()) != 0 {
+		if _, exists := ag.LongNameToArgument[arg.GetLongName()]; exists {
+			return fmt.Errorf("argument with long name %s already exists", arg.GetLongName())
+		}
+		ag.LongNameToArgument[arg.GetLongName()] = arg
 	}
+
 	ag.LongNameToArgument[arg.GetLongName()] = arg
 
 	ag.Arguments = append(ag.Arguments, arg)
