@@ -55,6 +55,26 @@ func (ag *ArgumentGroup) NewIntArgument(ptr *int, shortName, longName string, de
 	return err
 }
 
+// NewIntRangeArgument registers a new integer range argument with the argument parser.
+//
+// Parameters:
+// - ptr: A pointer to the integer variable where the argument value will be stored.
+// - shortName: The short name (single character) of the argument, prefixed with a dash (e.g., "-i").
+// - longName: The long name of the argument, prefixed with two dashes (e.g., "--iterations").
+// - defaultValue: The default value of the argument if it is not provided by the user.
+// - min: The minimum value of the argument.
+// - max: The maximum value of the argument.
+// - required: Indicates whether the argument must be specified by the user.
+// - help: A description of the argument, which will be displayed in the help message.
+//
+// The function creates a new IntRangeArgument with the provided parameters and adds it to the argument group.
+func (ag *ArgumentGroup) NewIntRangeArgument(ptr *int, shortName, longName string, defaultValue int, min int, max int, required bool, help string) error {
+	arg := arguments.IntRangeArgument{}
+	arg.Init(ptr, shortName, longName, defaultValue, min, max, required, help)
+	err := ag.Register(&arg)
+	return err
+}
+
 // NewTcpPortArgument registers a new integer argument with the argument parser.
 //
 // Parameters:
