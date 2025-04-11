@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/p0dalirius/goopts/parser"
+	"github.com/TheManticoreProject/goopts/parser"
 )
 
 // The ArgumentsParser is designed to handle command-line argument parsing for applications.

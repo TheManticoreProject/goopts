@@ -1,6 +1,6 @@
 package positionals
 
-import "github.com/p0dalirius/goopts/utils"
+import "github.com/TheManticoreProject/goopts/utils"
 
 // IntPositionalArgument represents a positional command-line argument that expects an integer value.
 // This struct is used to define and handle an integer input parameter, including its name, help message,

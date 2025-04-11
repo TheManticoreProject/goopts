@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/p0dalirius/goopts/arguments"
+	"github.com/TheManticoreProject/goopts/arguments"
 )
 
 const (

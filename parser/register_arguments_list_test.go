@@ -3,7 +3,7 @@ package parser
 import (
 	"testing"
 
-	"github.com/p0dalirius/goopts/argumentgroup"
+	"github.com/TheManticoreProject/goopts/argumentgroup"
 )
 
 func TestRegisterListOfIntsArgument(t *testing.T) {

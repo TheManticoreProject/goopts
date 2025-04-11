@@ -1,6 +1,6 @@
 package arguments
 
-import "github.com/p0dalirius/goopts/utils"
+import "github.com/TheManticoreProject/goopts/utils"
 
 // ListOfStringsArgument represents a command-line argument that expects a list of strings.
 // It provides information about the argument's short and long flag names, help message,

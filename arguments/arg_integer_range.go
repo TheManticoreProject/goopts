@@ -3,7 +3,7 @@ package arguments
 import (
 	"fmt"
 
-	"github.com/p0dalirius/goopts/utils"
+	"github.com/TheManticoreProject/goopts/utils"
 )
 
 // IntRangeArgument represents a command-line argument that expects an integer value within a specified range.

@@ -1,7 +1,7 @@
 package argumentgroup
 
 import (
-	"github.com/p0dalirius/goopts/arguments"
+	"github.com/TheManticoreProject/goopts/arguments"
 )
 
 // NewBoolArgument registers a new boolean argument with the argument parser.

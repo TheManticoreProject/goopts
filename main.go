@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/p0dalirius/goopts/subparser"
+	"github.com/TheManticoreProject/goopts/subparser"
 )
 
 var (
@@ -27,7 +27,7 @@ var (
 func parseArgs() {
 	// Create a new arguments parser with a custom banner
 	asp := subparser.ArgumentsSubparser{
-		Banner:          "PoC of goopts parsing v.1.1 - by Remi GASCOU (Podalirius)",
+		Banner:          "PoC of goopts parsing v.1.1 - by Remi GASCOU (Podalirius) @ TheManticoreProject",
 		Name:            "mode",
 		Value:           &mode,
 		CaseInsensitive: true,

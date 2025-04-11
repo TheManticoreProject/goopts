@@ -1,7 +1,7 @@
 package arguments
 
 import (
-	"github.com/p0dalirius/goopts/utils"
+	"github.com/TheManticoreProject/goopts/utils"
 )
 
 // BoolArgument represents a command-line argument that expects a boolean value.

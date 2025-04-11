@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/p0dalirius/goopts/subparser"
+	"github.com/TheManticoreProject/goopts/subparser"
 )
 
 var (

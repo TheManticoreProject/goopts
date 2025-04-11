@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/p0dalirius/goopts/parser"
+	"github.com/TheManticoreProject/goopts/parser"
 )
 
 var (

@@ -3,7 +3,7 @@ package parser
 import (
 	"fmt"
 
-	"github.com/p0dalirius/goopts/argumentgroup"
+	"github.com/TheManticoreProject/goopts/argumentgroup"
 )
 
 // NewArgumentGroup creates a new argument group with the specified name and adds it to the list of child groups.

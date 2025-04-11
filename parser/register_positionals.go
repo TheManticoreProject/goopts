@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/p0dalirius/goopts/positionals"
+	"github.com/TheManticoreProject/goopts/positionals"
 )
 
 // Register registers a new argument with the argument group if it does not already exist.

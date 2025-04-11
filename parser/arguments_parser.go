@@ -8,9 +8,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/p0dalirius/goopts/argumentgroup"
-	"github.com/p0dalirius/goopts/arguments"
-	"github.com/p0dalirius/goopts/positionals"
+	"github.com/TheManticoreProject/goopts/argumentgroup"
+	"github.com/TheManticoreProject/goopts/arguments"
+	"github.com/TheManticoreProject/goopts/positionals"
 )
 
 // ArgumentsParser is responsible for parsing command-line arguments for a program.

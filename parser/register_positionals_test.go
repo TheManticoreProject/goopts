@@ -3,7 +3,7 @@ package parser
 import (
 	"testing"
 
-	"github.com/p0dalirius/goopts/positionals"
+	"github.com/TheManticoreProject/goopts/positionals"
 )
 
 func TestRegisterStringPositionalArgument(t *testing.T) {

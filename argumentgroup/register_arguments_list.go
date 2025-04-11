@@ -1,7 +1,7 @@
 package argumentgroup
 
 import (
-	"github.com/p0dalirius/goopts/arguments"
+	"github.com/TheManticoreProject/goopts/arguments"
 )
 
 // NewListOfIntsArgument registers a new list of integers argument with the argument parser.

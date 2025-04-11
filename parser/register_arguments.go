@@ -3,8 +3,8 @@ package parser
 import (
 	"fmt"
 
-	"github.com/p0dalirius/goopts/argumentgroup"
-	"github.com/p0dalirius/goopts/arguments"
+	"github.com/TheManticoreProject/goopts/argumentgroup"
+	"github.com/TheManticoreProject/goopts/arguments"
 )
 
 // Register adds a new argument to the ArgumentsParser's default group.

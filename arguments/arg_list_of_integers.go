@@ -3,7 +3,7 @@ package arguments
 import (
 	"fmt"
 
-	"github.com/p0dalirius/goopts/utils"
+	"github.com/TheManticoreProject/goopts/utils"
 )
 
 // ListOfIntsArgument represents a command-line argument that expects a list of integers.

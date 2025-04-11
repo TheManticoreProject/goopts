@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/p0dalirius/goopts/parser"
+	"github.com/TheManticoreProject/goopts/parser"
 )
 
 var (
