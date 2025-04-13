@@ -128,3 +128,7 @@ This results in the following arguments and usage printing:
 ## Contributing
 
 Pull requests are welcome. Feel free to open an issue if you want to add other features.
+
+## Credits
+  - [@p0dalirius](https://github.com/p0dalirius) for the creation of the [goopts](https://github.com/p0dalirius/goopts) library before transferring it to TheManticoreProject.
+
