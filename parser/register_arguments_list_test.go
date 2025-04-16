@@ -8,7 +8,7 @@ import (
 
 func TestRegisterListOfIntsArgument(t *testing.T) {
 	ap := &ArgumentsParser{}
-	ap.DefaultGroup = &argumentgroup.ArgumentGroup{}
+	ap.Groups = make(map[string]*argumentgroup.ArgumentGroup)
 
 	var listArg []int
 	err := ap.NewListOfIntsArgument(&listArg, "-l", "--list", []int{1, 2, 3}, false, "List of integers argument")
@@ -16,15 +16,15 @@ func TestRegisterListOfIntsArgument(t *testing.T) {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
-	if len(ap.DefaultGroup.Arguments) != 1 {
-		t.Errorf("Expected 1 argument, got %d", len(ap.DefaultGroup.Arguments))
+	if len(ap.Groups[""].Arguments) != 1 {
+		t.Errorf("Expected 1 argument, got %d", len(ap.Groups[""].Arguments))
 	}
 
-	if _, exists := ap.DefaultGroup.ShortNameToArgument["-l"]; !exists {
+	if _, exists := ap.Groups[""].ShortNameToArgument["-l"]; !exists {
 		t.Errorf("Expected short name '-l' to be registered")
 	}
 
-	if _, exists := ap.DefaultGroup.LongNameToArgument["--list"]; !exists {
+	if _, exists := ap.Groups[""].LongNameToArgument["--list"]; !exists {
 		t.Errorf("Expected long name '--list' to be registered")
 	}
 

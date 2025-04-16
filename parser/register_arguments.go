@@ -17,33 +17,36 @@ import (
 // Returns:
 // - An error if the argument's short or long name conflicts with an existing argument, otherwise nil.
 func (ap *ArgumentsParser) Register(arg arguments.Argument) error {
-	if ap.DefaultGroup == nil {
-		ap.DefaultGroup = &argumentgroup.ArgumentGroup{}
+	if ap.Groups == nil {
+		ap.Groups = make(map[string]*argumentgroup.ArgumentGroup)
 	}
 
-	// Initiate the maps
-	if ap.DefaultGroup.ShortNameToArgument == nil {
-		ap.DefaultGroup.ShortNameToArgument = make(map[string]arguments.Argument)
+	// Initialize the default group with an empty string as its name if it doesn't exist
+	if _, exists := ap.Groups[""]; !exists {
+		ap.Groups[""] = &argumentgroup.ArgumentGroup{
+			ShortNameToArgument: make(map[string]arguments.Argument),
+			LongNameToArgument:  make(map[string]arguments.Argument),
+		}
 	}
-	if ap.DefaultGroup.LongNameToArgument == nil {
-		ap.DefaultGroup.LongNameToArgument = make(map[string]arguments.Argument)
-	}
+
+	defaultGroup := ap.Groups[""]
 
 	if len(arg.GetShortName()) != 0 {
-		if _, exists := ap.DefaultGroup.ShortNameToArgument[arg.GetShortName()]; exists {
+		if _, exists := defaultGroup.ShortNameToArgument[arg.GetShortName()]; exists {
 			return fmt.Errorf("argument with short name %s already exists", arg.GetShortName())
 		}
-		ap.DefaultGroup.ShortNameToArgument[arg.GetShortName()] = arg
+		defaultGroup.ShortNameToArgument[arg.GetShortName()] = arg
 	}
 
 	if len(arg.GetLongName()) != 0 {
-		if _, exists := ap.DefaultGroup.LongNameToArgument[arg.GetLongName()]; exists {
+		if _, exists := defaultGroup.LongNameToArgument[arg.GetLongName()]; exists {
 			return fmt.Errorf("argument with long name %s already exists", arg.GetLongName())
 		}
-		ap.DefaultGroup.LongNameToArgument[arg.GetLongName()] = arg
+		defaultGroup.LongNameToArgument[arg.GetLongName()] = arg
 	}
 
-	ap.DefaultGroup.Arguments = append(ap.DefaultGroup.Arguments, arg)
+	defaultGroup.Arguments = append(defaultGroup.Arguments, arg)
+
 	return nil
 }
 

@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/TheManticoreProject/goopts/subparser"
+	"github.com/TheManticoreProject/goopts/parser"
 )
 
 var (
-	mode string
+	mode        string
+	groupA_mode string
 
 	// Positional arguments
 	filePath          string
@@ -26,48 +27,39 @@ var (
 
 func parseArgs() {
 	// Create a new arguments parser with a custom banner
-	asp := subparser.ArgumentsSubparser{
-		Banner:          "PoC of goopts parsing v.1.1 - by Remi GASCOU (Podalirius) @ TheManticoreProject",
-		Name:            "mode",
-		Value:           &mode,
-		CaseInsensitive: true,
+	ap := parser.NewParser("PoC of goopts parsing v1.2.0 - by Remi GASCOU (Podalirius) @ TheManticoreProject")
+	ap.SetupSubParsing("mode", &mode, true)
+
+	// Define positional subparsers
+	subparser_groupA := ap.AddSubParser("groupA", "groupA mode.")
+	subparser_groupA.SetupSubParsing("groupA_mode", &groupA_mode, true)
+
+	subparser_groupA_groupAB := subparser_groupA.AddSubParser("groupAB", "groupAB mode.")
+	subparser_groupA_groupAB.NewBoolArgument(&enableLogging, "", "--enable-logging", true, "Enable logging during execution.")
+	subparser_groupA_groupAB_server, err := subparser_groupA_groupAB.NewArgumentGroup("Server")
+	if err != nil {
+		fmt.Printf("[-] Error creating group: %s\n", err)
+	} else {
+		subparser_groupA_groupAB_server.NewStringArgument(&dbHost, "", "--db-host", "The database host.", true, "The database host.")
+		subparser_groupA_groupAB_server.NewIntArgument(&serverPort, "", "--server-port", 1337, true, "The server port.")
+	}
+
+	subparser_groupA_groupAC := subparser_groupA.AddSubParser("groupAC", "groupAC mode.")
+	subparser_groupA_groupAC.NewStringArgument(&dbHost, "", "--db-host", "The database host.", true, "The database host.")
+	subparser_groupA_groupAC_server, err := subparser_groupA_groupAC.NewArgumentGroup("Server")
+	if err != nil {
+		fmt.Printf("[-] Error creating group: %s\n", err)
+	} else {
+		subparser_groupA_groupAC_server.NewStringArgument(&serverIP, "", "--server-ip", "The server IP.", true, "The server IP.")
+		subparser_groupA_groupAC_server.NewIntArgument(&serverPort, "", "--server-port", 1337, true, "The server port.")
 	}
 
 	// Define positional subparsers
-	subparser_recon := asp.AddSubParser("recon", "Reconnaissance mode.")
-	subparser_recon.NewBoolArgument(&enableLogging, "", "--enable-logging", true, "Enable logging during execution.")
-	subparser_recon.NewBoolArgument(&disableEncryption, "", "--disable-encryption", false, "Disable encryption for data transfer.")
-	subparser_recon.NewStringArgument(&filePath, "f", "file", "The file to recon.", true, "The file to recon.")
-	subparser_recon.NewStringArgument(&outputFolder, "o", "output", "The output folder.", true, "The output folder.")
-
-	// Define an argument group for database authentication
-	group_dbAuth, err := subparser_recon.NewArgumentGroup("Database Authentication")
-	if err != nil {
-		fmt.Printf("[error] Error creating ArgumentGroup: %s\n", err)
-	} else {
-		group_dbAuth.NewStringArgument(&dbHost, "-H", "--db-host", "", true, "Hostname or IP of the database server.")
-		group_dbAuth.NewStringArgument(&dbUsername, "-U", "--db-username", "", true, "Username for database authentication.")
-		group_dbAuth.NewStringArgument(&dbPassword, "-P", "--db-password", "", true, "Password for database authentication.")
-		group_dbAuth.NewTcpPortArgument(&dbPort, "-p", "--db-port", 3306, false, "Port number of the database server.")
-	}
-
-	subparser_scan := asp.AddSubParser("scan", "Scan mode.")
-	subparser_scan.NewStringArgument(&filePath, "f", "file", "The file to scan.", true, "The file to scan.")
-	// Define an argument group for server settings
-	group_serverSettings, err := subparser_scan.NewArgumentGroup("Server Settings")
-	if err != nil {
-		fmt.Printf("[error] Error creating ArgumentGroup: %s\n", err)
-	} else {
-		group_serverSettings.NewStringArgument(&serverIP, "-i", "--server-ip", "", true, "IP address of the server to connect.")
-		group_serverSettings.NewTcpPortArgument(&serverPort, "-s", "--server-port", 8080, false, "Port on which the server listens.")
-	}
-
-	// Define positional subparsers
-	subparser_add := asp.AddSubParser("add", "Add mode.")
-	subparser_add.NewStringArgument(&filePath, "f", "file", "The file to add.", true, "The file to add.")
+	subparser_groupZ := ap.AddSubParser("groupZ", "Add mode.")
+	subparser_groupZ.NewStringArgument(&filePath, "f", "file", "The file to add.", true, "The file to add.")
 
 	// Parse the flags
-	asp.Parse()
+	ap.Parse()
 }
 
 func main() {
@@ -75,20 +67,19 @@ func main() {
 
 	fmt.Printf("mode: %s\n\n", mode)
 
-	fmt.Printf("[+] recon\n")
-	fmt.Printf("  | filePath: %s\n", filePath)
-	fmt.Printf("  | outputFolder: %s\n", outputFolder)
-	fmt.Printf("  | enableLogging: %t\n", enableLogging)
-	fmt.Printf("  | disableEncryption: %t\n", disableEncryption)
-	fmt.Printf("  | dbHost: %s\n", dbHost)
-	fmt.Printf("  | dbUsername: %s\n", dbUsername)
-	fmt.Printf("  | dbPassword: %s\n", dbPassword)
-	fmt.Printf("  | dbPort: %d\n", dbPort)
-	fmt.Printf("  | serverIP: %s\n", serverIP)
-	fmt.Printf("  | serverPort: %d\n\n", serverPort)
+	fmt.Printf("[+] groupA\n")
+	fmt.Printf("  | Mode: %s\n", groupA_mode)
+	fmt.Printf("  | Enable Logging: %t\n", enableLogging)
+	fmt.Printf("  | Disable Encryption: %t\n", disableEncryption)
+	fmt.Printf("  | Database Host: %s\n", dbHost)
+	fmt.Printf("  | Database Username: %s\n", dbUsername)
+	fmt.Printf("  | Database Password: %s\n", dbPassword)
+	fmt.Printf("  | Database Port: %d\n", dbPort)
+	fmt.Printf("  | Server IP: %s\n", serverIP)
+	fmt.Printf("  | Server Port: %d\n\n", serverPort)
 
-	fmt.Printf("[+] scan\n")
-	fmt.Printf("  | filePath: %s\n", filePath)
-	fmt.Printf("  | serverIP: %s\n", serverIP)
-	fmt.Printf("  | serverPort: %d\n", serverPort)
+	fmt.Printf("[+] groupB\n")
+	fmt.Printf("  | File Path: %s\n", filePath)
+	fmt.Printf("  | Server IP: %s\n", serverIP)
+	fmt.Printf("  | Server Port: %d\n", serverPort)
 }

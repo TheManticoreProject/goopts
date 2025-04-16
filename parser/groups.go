@@ -23,6 +23,10 @@ func (ap *ArgumentsParser) NewArgumentGroup(name string) (*argumentgroup.Argumen
 		ap.Groups = make(map[string]*argumentgroup.ArgumentGroup)
 	}
 
+	if len(name) == 0 {
+		return nil, fmt.Errorf("name of group cannot be empty, this is reserved for the default group")
+	}
+
 	group := argumentgroup.ArgumentGroup{
 		Name: name,
 		Type: argumentgroup.ARGUMENT_GROUP_TYPE_NORMAL,
