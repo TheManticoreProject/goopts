@@ -104,23 +104,12 @@ func (ap *ArgumentsParser) populateMaps() {
 //	If required arguments are missing or extra positional arguments are found, error messages
 //	will be displayed, and the program will exit with a non-zero status.
 func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
-	debug := false
-
-	if debug {
-		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] ==> Entering\n", index)
-		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Calling populateMaps()\n", index)
-	}
 	ap.populateMaps()
 
 	if len(ap.Banner) != 0 && ap.Options.ShowBannerOnRun {
 		fmt.Printf("%s\n\n", ap.Banner)
 	}
 
-	if debug {
-		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Check if subparsers are enabled and have parsers\n", index)
-		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)]   | SubParsers: %+v\n", index, ap.SubParsers)
-		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)]   | SubParsers.Enabled: %+v\n", index, ap.SubParsers.Enabled)
-	}
 	if ap.SubParsers.Enabled && len(ap.SubParsers.Parsers) != 0 {
 		if index < len(parsingState.RawArguments) {
 			subparserName := parsingState.RawArguments[index]
@@ -128,20 +117,16 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 				ap.UsageFrom(index, parsingState)
 				os.Exit(0)
 			}
-			if debug {
-				fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Check if subparser %s exists\n", index, subparserName)
-			}
 			if asp, exists := ap.SubParsers.Parsers[subparserName]; exists {
-				if debug {
-					fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Subparser %s exists, parsing it\n", index, subparserName)
-				}
+				// Set the subparser name value to the pointer
+				*(ap.SubParsers.Value) = subparserName
 				asp.ParseFrom(index+1, parsingState)
 				return
 			} else {
 				if ap.SubParsers.CaseInsensitive {
-					parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("No subparser with name \"%s\" was found.", strings.ToLower(subparserName)))
+					parsingState.AddErrorMessage(fmt.Sprintf("No subparser with name \"%s\" was found.", strings.ToLower(subparserName)))
 				} else {
-					parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("No subparser with name \"%s\" was found.", subparserName))
+					parsingState.AddErrorMessage(fmt.Sprintf("No subparser with name \"%s\" was found.", subparserName))
 				}
 			}
 		} else {
@@ -150,9 +135,6 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		}
 	} else {
 		// Prepare arguments and split on "=" for `--arg=value`
-		if debug {
-			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Prepare arguments and split on \"=\" for `--arg=value`\n", index)
-		}
 		arguments := []string{}
 		for _, arg := range parsingState.RawArguments[index:] {
 			if strings.Contains(arg, "=") && strings.HasPrefix(arg, "-") {
@@ -163,26 +145,17 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		}
 
 		// Check if -h or --help are present
-		if debug {
-			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Check if -h or --help are present\n", index)
-		}
 		if slices.Contains(arguments, "-h") || slices.Contains(arguments, "--help") {
 			ap.UsageFrom(index, parsingState)
 			os.Exit(0)
 		}
 
 		// Reset all arguments to their default values
-		if debug {
-			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Reset all arguments to their default values\n", index)
-		}
 		for _, arg := range ap.allArguments {
 			arg.ResetDefaultValue()
 		}
 
 		// Split between positional arguments and other arguments
-		if debug {
-			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Split between positional arguments and other arguments\n", index)
-		}
 		potentialPositionalArguments := []string{}
 		otherArguments := []string{}
 		parsingPositionalArguments := true
@@ -198,9 +171,6 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		}
 
 		// Parse the positional arguments first
-		if debug {
-			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Parse the positional arguments first\n", index)
-		}
 		missingPositionalArguments := []string{}
 		for k, posarg := range ap.PositionalArguments {
 			if k < len(potentialPositionalArguments) {
@@ -218,7 +188,7 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 					errmsg = errmsg + fmt.Sprintf(" <%s>", posarg)
 				}
 				errmsg = errmsg + "."
-				parsingState.ErrorMessages = append(parsingState.ErrorMessages, errmsg)
+				parsingState.AddErrorMessage(errmsg)
 			}
 		}
 		if len(potentialPositionalArguments) > len(ap.PositionalArguments) {
@@ -231,24 +201,15 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 					errmsg = errmsg + fmt.Sprintf(" \"%s\"", loposarg)
 				}
 				errmsg = errmsg + "."
-				parsingState.ErrorMessages = append(parsingState.ErrorMessages, errmsg)
+				parsingState.AddErrorMessage(errmsg)
 			}
 		}
 
 		// Parse all other arguments
-		if debug {
-			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Parse all other arguments\n", index)
-		}
 		for k, otherarg := range otherArguments {
 			if strings.HasPrefix(otherarg, "--") {
 				// Long flag name
-				if debug {
-					fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] | Processing argument with long name: [%s]\n", index, otherarg)
-				}
 				if _, exists := ap.longNameToArgument[otherarg]; exists {
-					if debug {
-						fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] |  | Argument exists, consuming argument.\n", index)
-					}
 					arg := ap.longNameToArgument[otherarg]
 					_, err := arg.Consume(otherArguments[k:])
 					if err != nil {
@@ -257,13 +218,7 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 				}
 			} else if strings.HasPrefix(otherarg, "-") {
 				// Short flag name
-				if debug {
-					fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] | Processing argument with short name: [%s]\n", index, otherarg)
-				}
 				if _, exists := ap.shortNameToArgument[otherarg]; exists {
-					if debug {
-						fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] |  | Argument exists, consuming argument.\n", index)
-					}
 					arg := ap.shortNameToArgument[otherarg]
 					_, err := arg.Consume(otherArguments[k:])
 					if err != nil {
@@ -274,9 +229,6 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		}
 
 		// Check if all required arguments have been parsed
-		if debug {
-			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Check if all required arguments have been parsed\n", index)
-		}
 		requiredArgumentsMissing := []string{}
 		for _, arg := range ap.requiredArguments {
 			if !arg.IsPresent() {
@@ -292,9 +244,6 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		}
 
 		// Check if all required arguments in groups have been parsed
-		if debug {
-			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Check if all required arguments in groups have been parsed\n", index)
-		}
 		for _, group := range ap.Groups {
 			argumentsPresent := []string{}
 			argumentsMissing := []string{}
@@ -335,19 +284,13 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		}
 	}
 
+	// If there are error messages, print usage and exit
 	if len(parsingState.ErrorMessages) != 0 {
-		if debug {
-			fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] Error messages found, printing usage and exiting\n", index)
-		}
 		ap.UsageFrom(index, parsingState)
 		for _, errmsg := range parsingState.ErrorMessages {
 			fmt.Printf("[!] %s\n", errmsg)
 		}
 		os.Exit(1)
-	}
-
-	if debug {
-		fmt.Printf("[debug][ArgumentsParser.ParseFrom(%d)] No errors found, arguments are parsed!\n", index)
 	}
 }
 
