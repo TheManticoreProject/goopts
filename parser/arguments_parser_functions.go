@@ -35,13 +35,13 @@ func (ap *ArgumentsParser) ArgumentIsPresent(argumentName string) bool {
 
 	if argumentName[1] == '-' {
 		// Long argument flag (e.g., --example)
-		if argument, exists := ap.longNameToArgument[argumentName]; exists {
-			return argument.IsPresent()
+		if argument, exists := ap.ParsingState.ParsedArguments.LongNameToArgument[argumentName]; exists {
+			return (*argument).IsPresent()
 		}
 	} else {
 		// Short argument flag (e.g., -e)
-		if argument, exists := ap.shortNameToArgument[argumentName]; exists {
-			return argument.IsPresent()
+		if argument, exists := ap.ParsingState.ParsedArguments.ShortNameToArgument[argumentName]; exists {
+			return (*argument).IsPresent()
 		}
 	}
 

@@ -18,6 +18,9 @@ type ArgumentsParser struct {
 	// Options holds various configuration options for the ArgumentsParser.
 	Options ArgumentsParserOptions
 
+	// ParsingState holds the state of the parsing process.
+	ParsingState ParsingState
+
 	// PositionalArguments is a slice of pointers to positional arguments
 	// that the parser will manage.
 	PositionalArguments []positionals.PositionalArgument

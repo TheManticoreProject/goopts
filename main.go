@@ -60,6 +60,8 @@ func parseArgs() {
 
 	// Parse the flags
 	ap.Parse()
+
+	fmt.Printf("[+] Has Server Port: %t\n", ap.ArgumentIsPresent("--server-port"))
 }
 
 func main() {
@@ -68,18 +70,19 @@ func main() {
 	fmt.Printf("mode: %s\n\n", mode)
 
 	fmt.Printf("[+] groupA\n")
-	fmt.Printf("  | Mode: %s\n", groupA_mode)
-	fmt.Printf("  | Enable Logging: %t\n", enableLogging)
-	fmt.Printf("  | Disable Encryption: %t\n", disableEncryption)
-	fmt.Printf("  | Database Host: %s\n", dbHost)
-	fmt.Printf("  | Database Username: %s\n", dbUsername)
-	fmt.Printf("  | Database Password: %s\n", dbPassword)
-	fmt.Printf("  | Database Port: %d\n", dbPort)
-	fmt.Printf("  | Server IP: %s\n", serverIP)
-	fmt.Printf("  | Server Port: %d\n\n", serverPort)
+	fmt.Printf("  | Mode---------------: [%s]\n", groupA_mode)
+	fmt.Printf("  | Enable Logging-----: [%t]\n", enableLogging)
+	fmt.Printf("  | Disable Encryption-: [%t]\n", disableEncryption)
+	fmt.Printf("  | Database Host------: [%s]\n", dbHost)
+	fmt.Printf("  | Database Username--: [%s]\n", dbUsername)
+	fmt.Printf("  | Database Password--: [%s]\n", dbPassword)
+	fmt.Printf("  | Database Port------: [%d]\n", dbPort)
+	fmt.Printf("  | Server IP----------: [%s]\n", serverIP)
+	fmt.Printf("  | Server Port--------: [%d]\n\n", serverPort)
 
 	fmt.Printf("[+] groupB\n")
-	fmt.Printf("  | File Path: %s\n", filePath)
-	fmt.Printf("  | Server IP: %s\n", serverIP)
-	fmt.Printf("  | Server Port: %d\n", serverPort)
+	fmt.Printf("  | File Path----------: [%s]\n", filePath)
+	fmt.Printf("  | Server IP----------: [%s]\n", serverIP)
+	fmt.Printf("  | Server Port--------: [%d]\n\n", serverPort)
+
 }

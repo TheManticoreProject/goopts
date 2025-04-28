@@ -8,6 +8,7 @@ import (
 
 	"github.com/TheManticoreProject/goopts/argumentgroup"
 	"github.com/TheManticoreProject/goopts/arguments"
+	"github.com/TheManticoreProject/goopts/positionals"
 )
 
 // populateMaps initializes the maps that store the associations between short and long argument names
@@ -77,6 +78,16 @@ func (ap *ArgumentsParser) populateMaps() {
 		// Not initialized, we init it for the first time
 		ap.Groups = make(map[string]*argumentgroup.ArgumentGroup)
 	}
+
+	if ap.ParsingState.ParsedArguments.PositionalArguments == nil {
+		ap.ParsingState.ParsedArguments.PositionalArguments = make(map[string]*positionals.PositionalArgument)
+	}
+	if ap.ParsingState.ParsedArguments.LongNameToArgument == nil {
+		ap.ParsingState.ParsedArguments.LongNameToArgument = make(map[string]*arguments.Argument)
+	}
+	if ap.ParsingState.ParsedArguments.ShortNameToArgument == nil {
+		ap.ParsingState.ParsedArguments.ShortNameToArgument = make(map[string]*arguments.Argument)
+	}
 }
 
 // Parse processes the command-line arguments and sets the values for the defined arguments.
@@ -106,10 +117,12 @@ func (ap *ArgumentsParser) populateMaps() {
 func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 	ap.populateMaps()
 
+	// Print the banner if it is set and the option is enabled
 	if len(ap.Banner) != 0 && ap.Options.ShowBannerOnRun {
 		fmt.Printf("%s\n\n", ap.Banner)
 	}
 
+	// Handle subparsers if enabled
 	if ap.SubParsers.Enabled && len(ap.SubParsers.Parsers) != 0 {
 		if index < len(parsingState.RawArguments) {
 			subparserName := parsingState.RawArguments[index]
@@ -175,6 +188,7 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		for k, posarg := range ap.PositionalArguments {
 			if k < len(potentialPositionalArguments) {
 				posarg.Consume([]string{potentialPositionalArguments[k]})
+				parsingState.ParsedArguments.AddPositionalArgument(&posarg)
 			} else {
 				missingPositionalArguments = append(missingPositionalArguments, posarg.GetName())
 			}
@@ -213,7 +227,9 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 					arg := ap.longNameToArgument[otherarg]
 					_, err := arg.Consume(otherArguments[k:])
 					if err != nil {
-						parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("Error parsing argument: %s", err))
+						parsingState.AddErrorMessage(fmt.Sprintf("Error parsing argument: %s", err))
+					} else {
+						parsingState.ParsedArguments.AddArgument(&arg)
 					}
 				}
 			} else if strings.HasPrefix(otherarg, "-") {
@@ -222,7 +238,9 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 					arg := ap.shortNameToArgument[otherarg]
 					_, err := arg.Consume(otherArguments[k:])
 					if err != nil {
-						parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("Error parsing argument: %s", err))
+						parsingState.AddErrorMessage(fmt.Sprintf("Error parsing argument: %s", err))
+					} else {
+						parsingState.ParsedArguments.AddArgument(&arg)
 					}
 				}
 			}
@@ -237,9 +255,9 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		}
 		if len(requiredArgumentsMissing) != 0 {
 			if len(requiredArgumentsMissing) == 1 {
-				parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("Missing required argument \"%s\"", requiredArgumentsMissing[0]))
+				parsingState.AddErrorMessage(fmt.Sprintf("Missing required argument \"%s\"", requiredArgumentsMissing[0]))
 			} else {
-				parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("Missing required arguments \"%s\"", strings.Join(requiredArgumentsMissing, "\", \"")))
+				parsingState.AddErrorMessage(fmt.Sprintf("Missing required arguments \"%s\"", strings.Join(requiredArgumentsMissing, "\", \"")))
 			}
 		}
 
@@ -259,25 +277,25 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 				// One needs to be set, and one only
 				if len(argumentsPresent) == 0 {
 					if len(argumentsMissing) == 1 {
-						parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("The argument \"%s\" needs to be set.", argumentsMissing[0]))
+						parsingState.AddErrorMessage(fmt.Sprintf("The argument \"%s\" needs to be set.", argumentsMissing[0]))
 					} else if len(argumentsMissing) > 1 {
-						parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("At least one of the arguments \"%s\" needs to be set.", strings.Join(argumentsMissing, "\", \"")))
+						parsingState.AddErrorMessage(fmt.Sprintf("At least one of the arguments \"%s\" needs to be set.", strings.Join(argumentsMissing, "\", \"")))
 					}
 				} else if len(argumentsPresent) > 1 {
-					parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("Arguments \"%s\" cannot be set together.", strings.Join(argumentsPresent, "\", \"")))
+					parsingState.AddErrorMessage(fmt.Sprintf("Arguments \"%s\" cannot be set together.", strings.Join(argumentsPresent, "\", \"")))
 				}
 			} else if group.Type == argumentgroup.ARGUMENT_GROUP_TYPE_NOT_REQUIRED_MUTUALLY_EXCLUSIVE {
 				// None can be set but if one is set then only one has to be set
 				if len(argumentsPresent) > 1 {
-					parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("Arguments \"%s\" cannot be set together.", strings.Join(argumentsPresent, "\", \"")))
+					parsingState.AddErrorMessage(fmt.Sprintf("Arguments \"%s\" cannot be set together.", strings.Join(argumentsPresent, "\", \"")))
 				}
 			} else if group.Type == argumentgroup.ARGUMENT_GROUP_TYPE_DEPENDENT {
 				// If one is set, all need to be set
 				if len(argumentsMissing) != 0 {
 					if len(argumentsPresent) > 1 {
-						parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("When arguments \"%s\" are set, \"%s\" need to be set too.", strings.Join(argumentsPresent, "\", \""), strings.Join(argumentsMissing, "\", \"")))
+						parsingState.AddErrorMessage(fmt.Sprintf("When arguments \"%s\" are set, \"%s\" need to be set too.", strings.Join(argumentsPresent, "\", \""), strings.Join(argumentsMissing, "\", \"")))
 					} else if len(argumentsPresent) == 1 {
-						parsingState.ErrorMessages = append(parsingState.ErrorMessages, fmt.Sprintf("When argument \"%s\" is set, \"%s\" need to be set too.", argumentsPresent[0], strings.Join(argumentsMissing, "\", \"")))
+						parsingState.AddErrorMessage(fmt.Sprintf("When argument \"%s\" is set, \"%s\" need to be set too.", argumentsPresent[0], strings.Join(argumentsMissing, "\", \"")))
 					}
 				}
 			}
@@ -299,9 +317,6 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 // Returns:
 // - A map of parsed arguments.
 func (ap *ArgumentsParser) Parse() {
-	// We start parsing from index 1 because the first argument (0) is the program name
-	parsingState := ParsingState{
-		RawArguments: os.Args,
-	}
-	ap.ParseFrom(1, &parsingState)
+	ap.ParsingState.SetRawArguments(os.Args)
+	ap.ParseFrom(1, &ap.ParsingState)
 }

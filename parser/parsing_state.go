@@ -1,13 +1,28 @@
 package parser
 
-import "github.com/TheManticoreProject/goopts/arguments"
+import (
+	"github.com/TheManticoreProject/goopts/arguments"
+	"github.com/TheManticoreProject/goopts/positionals"
+)
 
 type ParsingState struct {
-	RawArguments []string
+	RawArguments    []string
+	ErrorMessages   []string
+	ParsedArguments ParsedArguments
+}
 
-	ErrorMessages []string
+type ParsedArguments struct {
+	PositionalArguments map[string]*positionals.PositionalArgument
+	LongNameToArgument  map[string]*arguments.Argument
+	ShortNameToArgument map[string]*arguments.Argument
+}
 
-	ParsedArguments map[string]*arguments.Argument
+// SetRawArguments sets the raw arguments in the parsing state.
+//
+// Parameters:
+// - rawArguments: The raw arguments to set.
+func (ps *ParsingState) SetRawArguments(rawArguments []string) {
+	ps.RawArguments = rawArguments
 }
 
 // AddErrorMessage adds an error message to the parsing state.
@@ -33,18 +48,27 @@ func (ps *ParsingState) GetErrorMessages() []string {
 	return ps.ErrorMessages
 }
 
-// GetParsedArguments returns the parsed arguments from the parsing state.
-//
-// Returns:
-// - A map of parsed arguments.
-func (ps *ParsingState) GetParsedArguments() map[string]*arguments.Argument {
-	return ps.ParsedArguments
-}
-
-// SetParsedArguments sets the parsed arguments in the parsing state.
+// AddArgument adds an argument to the parsing state.
 //
 // Parameters:
-// - parsedArguments: A map of parsed arguments.
-func (ps *ParsingState) SetParsedArguments(parsedArguments map[string]*arguments.Argument) {
-	ps.ParsedArguments = parsedArguments
+// - argument: The argument to add.
+func (pa *ParsedArguments) AddArgument(argument *arguments.Argument) {
+	longName := (*argument).GetLongName()
+	shortName := (*argument).GetShortName()
+
+	if len(longName) != 0 {
+		pa.LongNameToArgument[longName] = argument
+	}
+	if len(shortName) != 0 {
+		pa.ShortNameToArgument[shortName] = argument
+	}
+}
+
+// AddPositionalArgument adds a positional argument to the parsing state.
+//
+// Parameters:
+// - argument: The positional argument to add.
+func (pa *ParsedArguments) AddPositionalArgument(argument *positionals.PositionalArgument) {
+	name := (*argument).GetName()
+	pa.PositionalArguments[name] = argument
 }
