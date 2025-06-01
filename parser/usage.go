@@ -42,7 +42,7 @@ func (ap *ArgumentsParser) UsageFrom(index int, parsingState *ParsingState) {
 
 		// Compute the maximum length of the subparser names
 		maxLen := 0
-		for name := range ap.SubParsers.Parsers {
+		for _, name := range names {
 			if len(name) > maxLen {
 				maxLen = len(name)
 			}
@@ -50,7 +50,7 @@ func (ap *ArgumentsParser) UsageFrom(index int, parsingState *ParsingState) {
 		// Print the subparsers
 		usage += "\n\n"
 		fmtString := fmt.Sprintf("   %%-%ds  %%s\n", maxLen)
-		for name := range ap.SubParsers.Parsers {
+		for _, name := range names {
 			usage += fmt.Sprintf(fmtString, name, ap.SubParsers.Parsers[name].Banner)
 		}
 
