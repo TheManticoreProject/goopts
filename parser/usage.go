@@ -104,7 +104,7 @@ func (ap *ArgumentsParser) UsageFrom(index int, parsingState *ParsingState) {
 				}
 			} else {
 				fmtString := fmt.Sprintf("    %s %%s\n", computePaddingFormat(group.Arguments))
-				usage += fmt.Sprintf("\n  %s:\n", group.Name)
+				usage += fmt.Sprintf("  %s:\n", group.Name)
 				for _, argument := range group.Arguments {
 					usage += generateArgumentLineInHelp(argument, fmtString)
 				}
