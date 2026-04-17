@@ -67,7 +67,7 @@ func (arg ListOfStringsArgument) GetDefaultValue() any {
 
 // ResetDefaultValue resets the value of the argument to the default value.
 func (arg *ListOfStringsArgument) ResetDefaultValue() {
-	*(arg.Value) = append(*(arg.Value), arg.DefaultValue...)
+	*(arg.Value) = append([]string{}, arg.DefaultValue...)
 }
 
 // IsRequired returns whether the argument is required.
