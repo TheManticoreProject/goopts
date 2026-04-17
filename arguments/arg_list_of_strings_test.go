@@ -94,6 +94,27 @@ func TestListOfStringsArgument_Consume_NoMatch(t *testing.T) {
 	}
 }
 
+func TestListOfStringsArgument_ResetDefaultValue_Idempotent(t *testing.T) {
+	values := []string{}
+	arg := ListOfStringsArgument{}
+	arg.Init(&values, "", "list", []string{"a", "b"}, false, "help")
+
+	arg.ResetDefaultValue()
+	if !slices.Equal(*arg.Value, []string{"a", "b"}) {
+		t.Fatalf("after first reset expected [a b], got %v", *arg.Value)
+	}
+	arg.ResetDefaultValue()
+	if !slices.Equal(*arg.Value, []string{"a", "b"}) {
+		t.Fatalf("after second reset expected [a b], got %v", *arg.Value)
+	}
+
+	*arg.Value = append(*arg.Value, "user")
+	arg.ResetDefaultValue()
+	if !slices.Equal(*arg.Value, []string{"a", "b"}) {
+		t.Fatalf("reset should discard user values, got %v", *arg.Value)
+	}
+}
+
 func TestListOfStringsArgument_Getters(t *testing.T) {
 	values := []string{"item1", "item2"}
 	arg := ListOfStringsArgument{
