@@ -28,55 +28,35 @@ import (
 //	This method should be called before parsing command-line arguments to ensure that all arguments
 //	are correctly registered and accessible for lookup during the parsing process.
 func (ap *ArgumentsParser) populateMaps() {
-	// Create the maps even if they already exist
+	// Reset lookup maps and per-parse slices so repeated calls stay consistent
 	ap.shortNameToArgument = make(map[string]arguments.Argument)
 	ap.longNameToArgument = make(map[string]arguments.Argument)
+	ap.requiredArguments = ap.requiredArguments[:0]
+	ap.allArguments = ap.allArguments[:0]
 
 	if ap.Groups == nil {
 		ap.Groups = make(map[string]*argumentgroup.ArgumentGroup)
 	}
 
-	// Register arguments from the default group
-	if ap.Groups[""] != nil {
-		for _, arg := range ap.Groups[""].Arguments {
+	// Ensure the default group exists so downstream code can rely on it
+	if ap.Groups[""] == nil {
+		ap.Groups[""] = &argumentgroup.ArgumentGroup{}
+	}
+
+	// Register arguments from every group exactly once (the default group is keyed by "")
+	for _, group := range ap.Groups {
+		for _, arg := range group.Arguments {
 			if shortName := arg.GetShortName(); shortName != "" {
 				ap.shortNameToArgument[shortName] = arg
 			}
 			if longName := arg.GetLongName(); longName != "" {
 				ap.longNameToArgument[longName] = arg
 			}
-			//
 			if arg.IsRequired() {
 				ap.requiredArguments = append(ap.requiredArguments, arg)
 			}
 			ap.allArguments = append(ap.allArguments, arg)
 		}
-	} else {
-		// Not initialized, we init it for the first time
-		ag := argumentgroup.ArgumentGroup{}
-		ap.Groups[""] = &ag
-	}
-
-	// Register arguments from all sub groups
-	if ap.Groups != nil {
-		for _, group := range ap.Groups {
-			for _, arg := range group.Arguments {
-				if shortName := arg.GetShortName(); shortName != "" {
-					ap.shortNameToArgument[shortName] = arg
-				}
-				if longName := arg.GetLongName(); longName != "" {
-					ap.longNameToArgument[longName] = arg
-				}
-				//
-				if arg.IsRequired() {
-					ap.requiredArguments = append(ap.requiredArguments, arg)
-				}
-				ap.allArguments = append(ap.allArguments, arg)
-			}
-		}
-	} else {
-		// Not initialized, we init it for the first time
-		ap.Groups = make(map[string]*argumentgroup.ArgumentGroup)
 	}
 
 	if ap.ParsingState.ParsedArguments.PositionalArguments == nil {
