@@ -130,17 +130,17 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 				ap.UsageFrom(index, parsingState)
 				os.Exit(0)
 			}
-			if asp, exists := ap.SubParsers.Parsers[subparserName]; exists {
+			lookupName := subparserName
+			if ap.SubParsers.CaseInsensitive {
+				lookupName = strings.ToLower(subparserName)
+			}
+			if asp, exists := ap.SubParsers.Parsers[lookupName]; exists {
 				// Set the subparser name value to the pointer
-				*(ap.SubParsers.Value) = subparserName
+				*(ap.SubParsers.Value) = lookupName
 				asp.ParseFrom(index+1, parsingState)
 				return
 			} else {
-				if ap.SubParsers.CaseInsensitive {
-					parsingState.AddErrorMessage(fmt.Sprintf("No subparser with name \"%s\" was found.", strings.ToLower(subparserName)))
-				} else {
-					parsingState.AddErrorMessage(fmt.Sprintf("No subparser with name \"%s\" was found.", subparserName))
-				}
+				parsingState.AddErrorMessage(fmt.Sprintf("No subparser with name \"%s\" was found.", lookupName))
 			}
 		} else {
 			ap.UsageFrom(index, parsingState)
