@@ -71,12 +71,11 @@ func (arg *MapOfHttpHeadersArgument) SetValue(value any) {
 
 // ResetDefaultValue resets the value of the argument to the default value.
 func (arg *MapOfHttpHeadersArgument) ResetDefaultValue() {
-	if (*arg.Value) == nil {
-		(*arg.Value) = make(map[string]string, 0)
-	}
+	reset := make(map[string]string, len(arg.DefaultValue))
 	for key, value := range arg.DefaultValue {
-		(*arg.Value)[key] = value
+		reset[key] = value
 	}
+	*arg.Value = reset
 }
 
 // IsRequired returns whether the argument is required.
