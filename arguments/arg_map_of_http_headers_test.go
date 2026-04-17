@@ -112,3 +112,26 @@ func TestMapOfHttpHeadersArgument_Consume_NoMatch(t *testing.T) {
 		t.Errorf("Expected no headers to be set, got '%v'", value)
 	}
 }
+
+func TestMapOfHttpHeadersArgument_ResetDefaultValue_DiscardsPreviousKeys(t *testing.T) {
+	var value map[string]string
+	arg := MapOfHttpHeadersArgument{}
+	arg.Init(&value, "h", "headers", map[string]string{"Content-Type": "application/json"}, false, "help")
+
+	arg.ResetDefaultValue()
+	if !reflect.DeepEqual(*arg.Value, map[string]string{"Content-Type": "application/json"}) {
+		t.Fatalf("unexpected value after first reset: %v", *arg.Value)
+	}
+
+	if _, err := arg.Consume([]string{"--headers", "X-Extra: 1"}); err != nil {
+		t.Fatalf("consume failed: %v", err)
+	}
+
+	arg.ResetDefaultValue()
+	if _, leaked := (*arg.Value)["X-Extra"]; leaked {
+		t.Fatalf("reset should discard previously-set keys, got %v", *arg.Value)
+	}
+	if !reflect.DeepEqual(*arg.Value, map[string]string{"Content-Type": "application/json"}) {
+		t.Fatalf("unexpected value after reset: %v", *arg.Value)
+	}
+}
