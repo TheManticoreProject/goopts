@@ -71,7 +71,7 @@ func (arg ListOfIntsArgument) GetDefaultValue() any {
 
 // ResetDefaultValue resets the value of the argument to the default value.
 func (arg *ListOfIntsArgument) ResetDefaultValue() {
-	*(arg.Value) = append(*(arg.Value), arg.DefaultValue...)
+	*(arg.Value) = append([]int{}, arg.DefaultValue...)
 }
 
 // IsRequired returns whether the argument is required.

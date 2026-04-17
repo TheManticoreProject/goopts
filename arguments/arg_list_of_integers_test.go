@@ -94,6 +94,27 @@ func TestListOfIntsArgument_Consume_NoMatch(t *testing.T) {
 	}
 }
 
+func TestListOfIntsArgument_ResetDefaultValue_Idempotent(t *testing.T) {
+	values := []int{}
+	arg := ListOfIntsArgument{}
+	arg.Init(&values, "", "list", []int{1, 2}, false, "help")
+
+	arg.ResetDefaultValue()
+	if !slices.Equal(*arg.Value, []int{1, 2}) {
+		t.Fatalf("after first reset expected [1 2], got %v", *arg.Value)
+	}
+	arg.ResetDefaultValue()
+	if !slices.Equal(*arg.Value, []int{1, 2}) {
+		t.Fatalf("after second reset expected [1 2], got %v", *arg.Value)
+	}
+
+	*arg.Value = append(*arg.Value, 99)
+	arg.ResetDefaultValue()
+	if !slices.Equal(*arg.Value, []int{1, 2}) {
+		t.Fatalf("reset should discard user values, got %v", *arg.Value)
+	}
+}
+
 func TestListOfIntsArgument_Getters(t *testing.T) {
 	values := []int{7, 14}
 	arg := ListOfIntsArgument{
