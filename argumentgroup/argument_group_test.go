@@ -21,6 +21,40 @@ func TestArgumentGroup_Register_ExistingArgument(t *testing.T) {
 	}
 }
 
+func TestArgumentGroup_Register_ShortNameOnlyDoesNotPolluteLongNameMap(t *testing.T) {
+	var v1, v2 bool
+	ag := ArgumentGroup{Name: "G"}
+
+	if err := ag.NewBoolArgument(&v1, "x", "", false, "help"); err != nil {
+		t.Fatalf("unexpected error registering first arg: %v", err)
+	}
+	if _, ok := ag.LongNameToArgument[""]; ok {
+		t.Fatalf("LongNameToArgument should not contain an empty-string key, got %v", ag.LongNameToArgument)
+	}
+
+	if err := ag.NewBoolArgument(&v2, "x", "", false, "help"); err == nil {
+		t.Fatalf("duplicate short name should be rejected, got nil error")
+	}
+}
+
+func TestArgumentGroup_Register_TwoShortNameOnlyArgsCoexist(t *testing.T) {
+	var v1, v2 bool
+	ag := ArgumentGroup{Name: "G"}
+
+	if err := ag.NewBoolArgument(&v1, "x", "", false, "help"); err != nil {
+		t.Fatalf("unexpected error registering first arg: %v", err)
+	}
+	if err := ag.NewBoolArgument(&v2, "y", "", false, "help"); err != nil {
+		t.Fatalf("second short-only arg must register without error, got %v", err)
+	}
+	if len(ag.Arguments) != 2 {
+		t.Fatalf("expected 2 registered arguments, got %d", len(ag.Arguments))
+	}
+	if len(ag.LongNameToArgument) != 0 {
+		t.Fatalf("LongNameToArgument should be empty, got %v", ag.LongNameToArgument)
+	}
+}
+
 func TestArgumentGroup_PrintArgumentTree(t *testing.T) {
 	var stringValue string
 	argGroup := ArgumentGroup{Name: "Test Group"}

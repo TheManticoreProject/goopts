@@ -83,8 +83,6 @@ func (ag *ArgumentGroup) Register(arg arguments.Argument) error {
 		ag.LongNameToArgument[arg.GetLongName()] = arg
 	}
 
-	ag.LongNameToArgument[arg.GetLongName()] = arg
-
 	ag.Arguments = append(ag.Arguments, arg)
 	return nil
 }
