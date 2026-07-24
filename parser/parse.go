@@ -167,8 +167,12 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		missingPositionalArguments := []string{}
 		for k, posarg := range ap.PositionalArguments {
 			if k < len(potentialPositionalArguments) {
-				posarg.Consume([]string{potentialPositionalArguments[k]})
-				parsingState.ParsedArguments.AddPositionalArgument(&posarg)
+				_, err := posarg.Consume([]string{potentialPositionalArguments[k]})
+				if err != nil {
+					parsingState.AddErrorMessage(fmt.Sprintf("Error parsing positional argument <%s>: %s", posarg.GetName(), err))
+				} else {
+					parsingState.ParsedArguments.AddPositionalArgument(&posarg)
+				}
 			} else {
 				missingPositionalArguments = append(missingPositionalArguments, posarg.GetName())
 			}
