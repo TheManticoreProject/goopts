@@ -81,7 +81,8 @@ func (ap *ArgumentsParser) populateMaps() {
 //   - Detects the presence of help flags ("-h" or "--help") and displays usage information.
 //   - Separates positional arguments from named arguments based on the order of inputs.
 //   - Validates that all required positional and named arguments are provided and parses them.
-//   - Displays error messages for missing or extra arguments and exits if any errors are detected.
+//   - Reports an error for any argument starting with "-" that matches no registered short or long name.
+//   - Displays error messages for missing, unknown or extra arguments and exits if any errors are detected.
 //
 // Note:
 //
@@ -92,8 +93,8 @@ func (ap *ArgumentsParser) populateMaps() {
 //
 // Errors:
 //
-//	If required arguments are missing or extra positional arguments are found, error messages
-//	will be displayed, and the program will exit with a non-zero status.
+//	If required arguments are missing, unknown flags are supplied, or extra positional arguments
+//	are found, error messages will be displayed, and the program will exit with a non-zero status.
 func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 	ap.populateMaps()
 
@@ -204,28 +205,41 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		}
 
 		// Parse all other arguments
+		// Positions consumed as the value of a recognized flag are tracked so that
+		// values which look like flags (e.g. "--port -1") are not reported as unknown.
+		consumedAsValue := make(map[int]bool)
 		for k, otherarg := range otherArguments {
 			if strings.HasPrefix(otherarg, "--") {
 				// Long flag name
 				if _, exists := ap.longNameToArgument[otherarg]; exists {
 					arg := ap.longNameToArgument[otherarg]
-					_, err := arg.Consume(otherArguments[k:])
+					remaining, err := arg.Consume(otherArguments[k:])
 					if err != nil {
 						parsingState.AddErrorMessage(fmt.Sprintf("Error parsing argument: %s", err))
 					} else {
 						parsingState.ParsedArguments.AddArgument(&arg)
 					}
+					for i := k + 1; i < len(otherArguments)-len(remaining); i++ {
+						consumedAsValue[i] = true
+					}
+				} else if !consumedAsValue[k] {
+					parsingState.AddErrorMessage(fmt.Sprintf("Unknown argument \"%s\".", otherarg))
 				}
 			} else if strings.HasPrefix(otherarg, "-") {
 				// Short flag name
 				if _, exists := ap.shortNameToArgument[otherarg]; exists {
 					arg := ap.shortNameToArgument[otherarg]
-					_, err := arg.Consume(otherArguments[k:])
+					remaining, err := arg.Consume(otherArguments[k:])
 					if err != nil {
 						parsingState.AddErrorMessage(fmt.Sprintf("Error parsing argument: %s", err))
 					} else {
 						parsingState.ParsedArguments.AddArgument(&arg)
 					}
+					for i := k + 1; i < len(otherArguments)-len(remaining); i++ {
+						consumedAsValue[i] = true
+					}
+				} else if !consumedAsValue[k] {
+					parsingState.AddErrorMessage(fmt.Sprintf("Unknown argument \"%s\".", otherarg))
 				}
 			}
 		}
