@@ -43,6 +43,34 @@ func (ap *ArgumentsParser) sortedGroupNames() []string {
 	return groupNames
 }
 
+// formatGroupErrorMessage builds the error message reported for an unsatisfied argument group
+// constraint, prefixed with the name of the group the constraint belongs to.
+//
+// A parser can declare several constraint groups, each producing a message of the same shape, so
+// naming the group is what makes those lines distinguishable and lets them be matched with the
+// named sections of the usage message.
+//
+// Parameters:
+//   - groupName: The name of the argument group the constraint belongs to. It is empty for the
+//     default group.
+//   - message: The constraint message, written in lower case so it reads correctly after the
+//     group name.
+//
+// Returns:
+//   - The message prefixed with the group name, or the message alone with its first letter
+//     capitalized when the group has no name.
+func formatGroupErrorMessage(groupName, message string) string {
+	if len(groupName) == 0 {
+		if len(message) == 0 {
+			return message
+		}
+
+		return strings.ToUpper(message[:1]) + message[1:]
+	}
+
+	return fmt.Sprintf("%s: %s", groupName, message)
+}
+
 // populateMaps initializes the maps that store the associations between short and long argument names
 // and their corresponding argument structures. This method is called to prepare the parser for argument
 // handling and validation.
@@ -322,25 +350,25 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 				// One needs to be set, and one only
 				if len(argumentsPresent) == 0 {
 					if len(argumentsMissing) == 1 {
-						parsingState.AddErrorMessage(fmt.Sprintf("The argument \"%s\" needs to be set.", argumentsMissing[0]))
+						parsingState.AddErrorMessage(formatGroupErrorMessage(group.Name, fmt.Sprintf("the argument \"%s\" needs to be set.", argumentsMissing[0])))
 					} else if len(argumentsMissing) > 1 {
-						parsingState.AddErrorMessage(fmt.Sprintf("At least one of the arguments \"%s\" needs to be set.", strings.Join(argumentsMissing, "\", \"")))
+						parsingState.AddErrorMessage(formatGroupErrorMessage(group.Name, fmt.Sprintf("at least one of the arguments \"%s\" needs to be set.", strings.Join(argumentsMissing, "\", \""))))
 					}
 				} else if len(argumentsPresent) > 1 {
-					parsingState.AddErrorMessage(fmt.Sprintf("Arguments \"%s\" cannot be set together.", strings.Join(argumentsPresent, "\", \"")))
+					parsingState.AddErrorMessage(formatGroupErrorMessage(group.Name, fmt.Sprintf("arguments \"%s\" cannot be set together.", strings.Join(argumentsPresent, "\", \""))))
 				}
 			} else if group.Type == argumentgroup.ARGUMENT_GROUP_TYPE_NOT_REQUIRED_MUTUALLY_EXCLUSIVE {
 				// None can be set but if one is set then only one has to be set
 				if len(argumentsPresent) > 1 {
-					parsingState.AddErrorMessage(fmt.Sprintf("Arguments \"%s\" cannot be set together.", strings.Join(argumentsPresent, "\", \"")))
+					parsingState.AddErrorMessage(formatGroupErrorMessage(group.Name, fmt.Sprintf("arguments \"%s\" cannot be set together.", strings.Join(argumentsPresent, "\", \""))))
 				}
 			} else if group.Type == argumentgroup.ARGUMENT_GROUP_TYPE_DEPENDENT {
 				// If one is set, all need to be set
 				if len(argumentsMissing) != 0 {
 					if len(argumentsPresent) > 1 {
-						parsingState.AddErrorMessage(fmt.Sprintf("When arguments \"%s\" are set, \"%s\" need to be set too.", strings.Join(argumentsPresent, "\", \""), strings.Join(argumentsMissing, "\", \"")))
+						parsingState.AddErrorMessage(formatGroupErrorMessage(group.Name, fmt.Sprintf("when arguments \"%s\" are set, \"%s\" need to be set too.", strings.Join(argumentsPresent, "\", \""), strings.Join(argumentsMissing, "\", \""))))
 					} else if len(argumentsPresent) == 1 {
-						parsingState.AddErrorMessage(fmt.Sprintf("When argument \"%s\" is set, \"%s\" need to be set too.", argumentsPresent[0], strings.Join(argumentsMissing, "\", \"")))
+						parsingState.AddErrorMessage(formatGroupErrorMessage(group.Name, fmt.Sprintf("when argument \"%s\" is set, \"%s\" need to be set too.", argumentsPresent[0], strings.Join(argumentsMissing, "\", \""))))
 					}
 				}
 			}
