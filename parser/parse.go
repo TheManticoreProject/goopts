@@ -24,6 +24,25 @@ func isMutuallyExclusiveGroup(groupType int) bool {
 		groupType == argumentgroup.ARGUMENT_GROUP_TYPE_NOT_REQUIRED_MUTUALLY_EXCLUSIVE
 }
 
+// sortedGroupNames returns the names of all argument groups sorted alphabetically, including the
+// empty name of the default group.
+//
+// Iterating groups through this method instead of ranging over the `Groups` map keeps every output
+// derived from that iteration reproducible, since Go randomizes map iteration order. It also matches
+// the alphabetical group ordering used by the usage message.
+//
+// Returns:
+// - A slice of group names sorted alphabetically.
+func (ap *ArgumentsParser) sortedGroupNames() []string {
+	groupNames := make([]string, 0, len(ap.Groups))
+	for groupName := range ap.Groups {
+		groupNames = append(groupNames, groupName)
+	}
+	slices.Sort(groupNames)
+
+	return groupNames
+}
+
 // populateMaps initializes the maps that store the associations between short and long argument names
 // and their corresponding argument structures. This method is called to prepare the parser for argument
 // handling and validation.
@@ -62,8 +81,10 @@ func (ap *ArgumentsParser) populateMaps(parsingState *ParsingState) {
 		ap.Groups[""] = &argumentgroup.ArgumentGroup{}
 	}
 
-	// Register arguments from every group exactly once (the default group is keyed by "")
-	for _, group := range ap.Groups {
+	// Register arguments from every group exactly once (the default group is keyed by ""),
+	// in a stable order so that error messages built from these slices are reproducible
+	for _, groupName := range ap.sortedGroupNames() {
+		group := ap.Groups[groupName]
 		for _, arg := range group.Arguments {
 			if shortName := arg.GetShortName(); shortName != "" {
 				ap.shortNameToArgument[shortName] = arg
@@ -283,8 +304,10 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 			}
 		}
 
-		// Check if all required arguments in groups have been parsed
-		for _, group := range ap.Groups {
+		// Check if all required arguments in groups have been parsed, in a stable order so that
+		// the resulting error messages are always reported in the same sequence
+		for _, groupName := range ap.sortedGroupNames() {
+			group := ap.Groups[groupName]
 			argumentsPresent := []string{}
 			argumentsMissing := []string{}
 			for _, arg := range group.Arguments {
