@@ -11,6 +11,19 @@ import (
 	"github.com/TheManticoreProject/goopts/positionals"
 )
 
+// isMutuallyExclusiveGroup reports whether a group type enforces mutual exclusivity between its
+// members, in which case the group rule alone decides whether a member has to be set.
+//
+// Parameters:
+//   - groupType: The type of the argument group.
+//
+// Returns:
+// - true for the required and not required mutually exclusive group types, false otherwise.
+func isMutuallyExclusiveGroup(groupType int) bool {
+	return groupType == argumentgroup.ARGUMENT_GROUP_TYPE_REQUIRED_MUTUALLY_EXCLUSIVE ||
+		groupType == argumentgroup.ARGUMENT_GROUP_TYPE_NOT_REQUIRED_MUTUALLY_EXCLUSIVE
+}
+
 // populateMaps initializes the maps that store the associations between short and long argument names
 // and their corresponding argument structures. This method is called to prepare the parser for argument
 // handling and validation.
@@ -19,7 +32,8 @@ import (
 //   - It creates or resets the `shortNameToArgument` and `longNameToArgument` maps to ensure they
 //     are up-to-date.
 //   - Registers arguments from the default argument group, storing their short and long names in the
-//     respective maps. If an argument is required, it adds it to the `requiredArguments` slice.
+//     respective maps. If an argument is required, it adds it to the `requiredArguments` slice, unless
+//     it belongs to a mutually exclusive group, where the group rule decides whether it has to be set.
 //   - Registers arguments from all named subgroups in the `Groups` map, similarly storing their names
 //     and tracking required arguments.
 //   - Initializes the `ParsedArguments` maps of `parsingState`, which is the state parsing results are
@@ -57,7 +71,10 @@ func (ap *ArgumentsParser) populateMaps(parsingState *ParsingState) {
 			if longName := arg.GetLongName(); longName != "" {
 				ap.longNameToArgument[longName] = arg
 			}
-			if arg.IsRequired() {
+			// In a mutually exclusive group, whether a member has to be set is decided by the
+			// group rule, so its individual required flag is not enforced on its own: doing so
+			// would contradict the group and make every other member unusable
+			if arg.IsRequired() && !isMutuallyExclusiveGroup(group.Type) {
 				ap.requiredArguments = append(ap.requiredArguments, arg)
 			}
 			ap.allArguments = append(ap.allArguments, arg)
