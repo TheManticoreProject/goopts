@@ -15,7 +15,7 @@ func TestPopulateMaps_DefaultGroupRegisteredOnce(t *testing.T) {
 		t.Fatalf("NewIntArgument(b) failed: %v", err)
 	}
 
-	ap.populateMaps()
+	ap.populateMaps(&ap.ParsingState)
 
 	if got := len(ap.allArguments); got != 2 {
 		t.Fatalf("expected 2 arguments in allArguments, got %d", got)
@@ -25,8 +25,8 @@ func TestPopulateMaps_DefaultGroupRegisteredOnce(t *testing.T) {
 	}
 
 	// Calling populateMaps again must not grow the slices.
-	ap.populateMaps()
-	ap.populateMaps()
+	ap.populateMaps(&ap.ParsingState)
+	ap.populateMaps(&ap.ParsingState)
 
 	if got := len(ap.allArguments); got != 2 {
 		t.Fatalf("expected 2 arguments in allArguments after repeated calls, got %d", got)
@@ -53,7 +53,7 @@ func TestPopulateMaps_MixedGroupsCountedOnce(t *testing.T) {
 		t.Fatalf("group.NewIntArgument failed: %v", err)
 	}
 
-	ap.populateMaps()
+	ap.populateMaps(&ap.ParsingState)
 
 	if got := len(ap.allArguments); got != 2 {
 		t.Fatalf("expected 2 arguments in allArguments, got %d", got)
