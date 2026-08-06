@@ -22,12 +22,17 @@ import (
 //     respective maps. If an argument is required, it adds it to the `requiredArguments` slice.
 //   - Registers arguments from all named subgroups in the `Groups` map, similarly storing their names
 //     and tracking required arguments.
+//   - Initializes the `ParsedArguments` maps of `parsingState`, which is the state parsing results are
+//     recorded into and is not necessarily the parser's own `ParsingState`.
+//
+// Parameters:
+//   - parsingState: The parsing state that will be populated during the parse.
 //
 // Note:
 //
 //	This method should be called before parsing command-line arguments to ensure that all arguments
 //	are correctly registered and accessible for lookup during the parsing process.
-func (ap *ArgumentsParser) populateMaps() {
+func (ap *ArgumentsParser) populateMaps(parsingState *ParsingState) {
 	// Reset lookup maps and per-parse slices so repeated calls stay consistent
 	ap.shortNameToArgument = make(map[string]arguments.Argument)
 	ap.longNameToArgument = make(map[string]arguments.Argument)
@@ -59,14 +64,16 @@ func (ap *ArgumentsParser) populateMaps() {
 		}
 	}
 
-	if ap.ParsingState.ParsedArguments.PositionalArguments == nil {
-		ap.ParsingState.ParsedArguments.PositionalArguments = make(map[string]*positionals.PositionalArgument)
+	// Initialize the maps of the parsing state that will be written to during this parse,
+	// which is not necessarily the parser's own ap.ParsingState
+	if parsingState.ParsedArguments.PositionalArguments == nil {
+		parsingState.ParsedArguments.PositionalArguments = make(map[string]*positionals.PositionalArgument)
 	}
-	if ap.ParsingState.ParsedArguments.LongNameToArgument == nil {
-		ap.ParsingState.ParsedArguments.LongNameToArgument = make(map[string]*arguments.Argument)
+	if parsingState.ParsedArguments.LongNameToArgument == nil {
+		parsingState.ParsedArguments.LongNameToArgument = make(map[string]*arguments.Argument)
 	}
-	if ap.ParsingState.ParsedArguments.ShortNameToArgument == nil {
-		ap.ParsingState.ParsedArguments.ShortNameToArgument = make(map[string]*arguments.Argument)
+	if parsingState.ParsedArguments.ShortNameToArgument == nil {
+		parsingState.ParsedArguments.ShortNameToArgument = make(map[string]*arguments.Argument)
 	}
 }
 
@@ -95,7 +102,7 @@ func (ap *ArgumentsParser) populateMaps() {
 //	If required arguments are missing or extra positional arguments are found, error messages
 //	will be displayed, and the program will exit with a non-zero status.
 func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
-	ap.populateMaps()
+	ap.populateMaps(parsingState)
 
 	// Print the banner if it is set and the option is enabled
 	if len(ap.Banner) != 0 && ap.Options.ShowBannerOnRun {
