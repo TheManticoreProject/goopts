@@ -202,8 +202,15 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 		}
 	} else {
 		// Prepare arguments and split on "=" for `--arg=value`
+		// The index comes from the caller and can point past the end of the raw arguments, in
+		// which case there is simply nothing left to parse
+		rawArguments := []string{}
+		if index >= 0 && index < len(parsingState.RawArguments) {
+			rawArguments = parsingState.RawArguments[index:]
+		}
+
 		arguments := []string{}
-		for _, arg := range parsingState.RawArguments[index:] {
+		for _, arg := range rawArguments {
 			if strings.Contains(arg, "=") && strings.HasPrefix(arg, "-") {
 				arguments = append(arguments, strings.SplitN(arg, "=", 2)...)
 			} else {

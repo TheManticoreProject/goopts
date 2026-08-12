@@ -10,6 +10,29 @@ import (
 	"github.com/TheManticoreProject/goopts/arguments"
 )
 
+// programName returns the name to display at the start of the usage line.
+//
+// The raw arguments are supplied by the caller and may be empty, so the name of the running
+// executable is used as a fallback, which is what the raw arguments would have carried had they
+// come from os.Args.
+//
+// Parameters:
+//   - parsingState: The parsing state holding the raw arguments.
+//
+// Returns:
+//   - The base name of the first raw argument, of the running executable when there are no raw
+//     arguments, or "program" when neither is available.
+func programName(parsingState *ParsingState) string {
+	if len(parsingState.RawArguments) != 0 {
+		return filepath.Base(parsingState.RawArguments[0])
+	}
+	if len(os.Args) != 0 {
+		return filepath.Base(os.Args[0])
+	}
+
+	return "program"
+}
+
 // Usage prints the usage information for the command-line arguments.
 //
 // The function first prints the banner, followed by the usage string, which includes the name of the executable.
@@ -24,11 +47,12 @@ import (
 // the available command-line arguments and their descriptions.
 func (ap *ArgumentsParser) UsageFrom(index int, parsingState *ParsingState) {
 	// Create usage string
-	usage := "Usage: " + filepath.Base(parsingState.RawArguments[0])
-	if index != 0 {
-		for k := range index - 1 {
-			usage += " " + parsingState.RawArguments[k+1]
-		}
+	usage := "Usage: " + programName(parsingState)
+
+	// The index and the raw arguments both come from the caller, so the subparser prefix is
+	// limited to the arguments that are actually there
+	for k := 1; k < index && k < len(parsingState.RawArguments); k++ {
+		usage += " " + parsingState.RawArguments[k]
 	}
 
 	// Add subparsers
