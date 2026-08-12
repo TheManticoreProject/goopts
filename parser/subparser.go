@@ -19,6 +19,11 @@ type SubParsers struct {
 // It creates a new ArgumentsParser with the specified name and banner.
 // If the subparser is case-insensitive, it adds the subparser to the SubParsers with the specified name in lowercase.
 // Otherwise, it adds the subparser to the SubParsers with the specified name.
+//
+// The map of subparsers is created if needed and subparsing is enabled, so this can be called
+// without SetupSubParsing having run first, which is the case for every subparser nested under
+// another one. SetupSubParsing is still what binds a pointer to receive the selected subparser
+// name; without it the name is matched and dispatched but not stored anywhere.
 func (sp *SubParsers) AddSubParser(name, banner string) *ArgumentsParser {
 	parser_ptr := &ArgumentsParser{
 		Banner: banner,
@@ -27,6 +32,14 @@ func (sp *SubParsers) AddSubParser(name, banner string) *ArgumentsParser {
 			ShowBannerOnRun:  false,
 		},
 	}
+
+	// Only SetupSubParsing allocates the map, and the parsers created here never went through it,
+	// so a nested subparser would otherwise write to a nil map. Registering a subparser is also
+	// intent to dispatch on one, which is what Enabled means.
+	if sp.Parsers == nil {
+		sp.Parsers = make(map[string]*ArgumentsParser)
+	}
+	sp.Enabled = true
 
 	if sp.CaseInsensitive {
 		sp.Parsers[strings.ToLower(name)] = parser_ptr
