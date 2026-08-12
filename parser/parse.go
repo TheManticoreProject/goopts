@@ -189,8 +189,11 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 				lookupName = strings.ToLower(subparserName)
 			}
 			if asp, exists := ap.SubParsers.Parsers[lookupName]; exists {
-				// Set the subparser name value to the pointer
-				*(ap.SubParsers.Value) = lookupName
+				// Set the subparser name value to the pointer, which is only supplied by
+				// SetupSubParsing: subparsers registered without it have nowhere to store the name
+				if ap.SubParsers.Value != nil {
+					*(ap.SubParsers.Value) = lookupName
+				}
 				asp.ParseFrom(index+1, parsingState)
 				return
 			} else {
