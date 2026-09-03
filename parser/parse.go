@@ -184,20 +184,19 @@ func (ap *ArgumentsParser) ParseFrom(index int, parsingState *ParsingState) {
 				ap.UsageFrom(index, parsingState)
 				os.Exit(0)
 			}
-			lookupName := subparserName
-			if ap.SubParsers.CaseInsensitive {
-				lookupName = strings.ToLower(subparserName)
-			}
-			if asp, exists := ap.SubParsers.Parsers[lookupName]; exists {
+			if registeredName, asp, exists := ap.SubParsers.resolve(subparserName); exists {
 				// Set the subparser name value to the pointer, which is only supplied by
-				// SetupSubParsing: subparsers registered without it have nowhere to store the name
+				// SetupSubParsing: subparsers registered without it have nowhere to store the name.
+				// The name stored is the one the subparser was registered with, not the one that
+				// was typed, so that callers can compare it to the names they registered even when
+				// matching is case-insensitive.
 				if ap.SubParsers.Value != nil {
-					*(ap.SubParsers.Value) = lookupName
+					*(ap.SubParsers.Value) = registeredName
 				}
 				asp.ParseFrom(index+1, parsingState)
 				return
 			} else {
-				parsingState.AddErrorMessage(fmt.Sprintf("No subparser with name \"%s\" was found.", lookupName))
+				parsingState.AddErrorMessage(fmt.Sprintf("No subparser with name \"%s\" was found.", subparserName))
 			}
 		} else {
 			ap.UsageFrom(index, parsingState)
