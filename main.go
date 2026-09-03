@@ -28,11 +28,11 @@ var (
 func parseArgs() {
 	// Create a new arguments parser with a custom banner
 	ap := parser.NewParser("PoC of goopts parsing v1.2.0 - by Remi GASCOU (Podalirius) @ TheManticoreProject")
-	ap.SetupSubParsing("mode", &mode, true)
+	ap.SetupSubParsing("mode", &mode, false)
 
 	// Define positional subparsers
 	subparser_groupA := ap.AddSubParser("groupA", "groupA mode.")
-	subparser_groupA.SetupSubParsing("groupA_mode", &groupA_mode, true)
+	subparser_groupA.SetupSubParsing("groupA_mode", &groupA_mode, false)
 
 	subparser_groupA_groupAB := subparser_groupA.AddSubParser("groupAB", "groupAB mode.")
 	subparser_groupA_groupAB.NewBoolArgument(&enableLogging, "", "--enable-logging", true, "Enable logging during execution.")
@@ -57,6 +57,10 @@ func parseArgs() {
 	// Define positional subparsers
 	subparser_groupZ := ap.AddSubParser("groupZ", "Add mode.")
 	subparser_groupZ.NewStringArgument(&filePath, "f", "file", "The file to add.", true, "The file to add.")
+
+	// Match the subparser names of the whole tree without regard to case. This can be called at
+	// any point of the setup, before or after the subparsers are registered.
+	ap.SetSubparserNameCaseSensitive(false)
 
 	// Parse the flags
 	ap.Parse()
